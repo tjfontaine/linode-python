@@ -91,6 +91,9 @@ class Api:
           if not __kw.has_key(k) and (len(__args) == 2 and not __args[1].has_key(k)):
             raise MissingRequiredArgument(k)
         return func(*__args,**__kw)
+      wrapper.__name__ = func.__name__
+      wrapper.__doc__ = func.__doc__
+      wrapper.__dict__.update(func.__dict__)
       return wrapper
     return decorator
 
