@@ -29,12 +29,18 @@ import urllib2
 import simplejson
 
 class MissingRequiredArgument(Exception):
+  """\
+  Exception raised when a required parameter is missing.
+  """
   def __init__(self, value):
     self.value = value
   def __str__(self):
     return repr(self.value)
 
 class ApiError(Exception):
+  """\
+  Exception raised when the Linode API returns an error.
+  """
   def __init__(self, value):
     self.value = value
   def __str__(self):
@@ -84,6 +90,7 @@ class Api:
       return self.__send_request(request)
     return decorator
 
+  @__simple_decorator
   def __api_required(*args, **kw):
     def decorator(func):
       def wrapper(*__args,**__kw):
@@ -99,36 +106,121 @@ class Api:
 
   @__api_request
   def domainList(self, request):
-    """ """
+    """\
+    List the domains (zones) visible to the user.
+    Parameters:
+      None
+    Retruned fields:
+      DOMAINID       - The unique ID for this zone
+      DOMAIN         - The zone's name e.g. 'linode.com'
+      TYPE           - The zone type: 'master' or 'slave'
+      STATUS         - The zone's current status (see below)
+      SOA_EMAIL      - SOA email address for the zone
+      REFRESH_SEC *  - 'refresh' value for the zone
+      RETRY_SEC *    - 'retry' value for the zone
+      TTL_SEC *      - 'ttl' value for the zone
+    Possible values for STATUS
+      0 - Disabled   - The zone is not being served
+      1 - Active     - The zone is being served
+      2 - Edit Mode  - The zone is being served but changes are not rendered
+      3 - Has Errors - The zone has errors in the rendered zonefile
+    
+    * A value of zero indicates the default time
+    """
 
   @__api_required('DomainID')
   @__api_request
   def domainGet(self, request):
-    """ """
+    """\
+    Retreive the details for a specific domain.
+    Parameters:
+      DomainID       - The unique ID for the zone requested (required)
+    Retruned fields:
+      DOMAINID       - The unique ID for this zone
+      DOMAIN         - The zone's name e.g. 'linode.com'
+      TYPE           - The zone type: 'master' or 'slave'
+      STATUS         - The zone's status (see below)
+      SOA_EMAIL      - SOA email address for the zone
+      REFRESH_SEC *  - 'refresh' value for the zone
+      RETRY_SEC *    - 'retry' value for the zone
+      TTL_SEC *      - 'ttl' value for the zone
+    Possible values for STATUS
+      0 - Disabled   - The zone is not being served
+      1 - Active     - The zone is being served
+      2 - Edit Mode  - The zone is being served but changes are not rendered
+      3 - Has Errors - The zone has errors in the rendered zonefile
+    """
 
   @__api_required('DomainID', 'Domain', 'Type', 'Status', 'SOA_Email')
   @__api_request
   def domainSave(self, request):
-    """ """
+    """\
+    Create or update a domain within the DNS manger.
+    Parameters:
+      None
+    Retruned fields:
+      DOMAINID       - The unique ID for this zone
+    Possible values for STATUS
+      0 - Disabled   - The zone is not being served
+      1 - Active     - The zone is being served
+      2 - Edit Mode  - The zone is being served but changes are not rendered
+      3 - Has Errors - The zone has errors in the rendered zonefile
+    """
 
   @__api_required('DomainID')
   @__api_request
   def domainResourceList(self, request):
-    """ """
+    """\
+    List the resource records associated with a particular domain.
+    Parameters:
+      None
+    Retruned fields:
+      DOMAINID       - The unique ID for this zone
+    """
 
-  @__api_required('ResourceID', 'DomainID')
+  @__api_required('ResourceID')
   @__api_request
   def domainResourceGet(self, request):
-    """ """
+    """\
+    Retrieve the details for a specific resource record.
+    Parameters:
+      None
+    Retruned fields:
+      DOMAINID       - The unique ID for this zone
+    """
 
   @__api_required('ResourceID', 'DomainID')
   @__api_request
   def domainResourceSave(self, request):
-    """ """
+    """\
+    Create or update a resource record.
+    Parameters:
+      None
+    Retruned fields:
+      DOMAINID       - The unique ID for this zone
+    """
 
   @__api_request
   def linodeList(self, request):
-    """ """
+    """\
+    Lists the Lindodes visible to the user.
+    Parameters:
+      None
+    Retruned fields:
+      LINODEID       - The unique ID for this Linode
+      STATUS         - The Linode's status (see below)
+      HOSTHOSTNAME   - The DNS name for the host the Linode is on
+      LISHUSERNAME   - The username to connect to a Lish session
+      LABEL          - The label for the Linode, as seen on the Linode Manager
+      TOTALRAM       - Total RAM assigned to this Linode (MiB)
+      TOTALHD        - Total hard drive space assigned to this Linode (MiB)
+      TOTALXFER      - Total transfer assigned to this Linode (GiB)
+    Possible values for STATUS
+      0 - Disabled   - The zone is not being served
+      1 - Active     - The zone is being served
+      2 - Edit Mode  - The zone is being served but changes are not rendered
+      3 - Has Errors - The zone has errors in the rendered zonefile
+    """
 
 if __name__ == "__main__":
   from getpass import getpass
