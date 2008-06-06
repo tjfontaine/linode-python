@@ -90,7 +90,6 @@ class Api:
       return self.__send_request(request)
     return decorator
 
-  @__simple_decorator
   def __api_required(*args, **kw):
     def decorator(func):
       def wrapper(*__args,**__kw):
