@@ -95,7 +95,7 @@ class Api:
     def decorator(func):
       def wrapper(*__args,**__kw):
         for k in args:
-          if not __kw.has_key(k) and (len(__args) == 2 and not __args[1].has_key(k)):
+          if (not __kw.has_key(k) and len(__args) == 1) or (len(__args) == 2 and not __args[1].has_key(k)):
             raise MissingRequiredArgument(k)
         return func(*__args,**__kw)
       wrapper.__name__ = func.__name__
@@ -147,7 +147,7 @@ class Api:
     
     """
 
-  @__api_required('DomainID', 'Domain', 'Type', 'Status', 'SOA_Email')
+  @__api_required('DomainID', 'Domain', 'Type', 'Status')
   @__api_request
   def domainSave(self, request):
     """Create or update a specific domain.
@@ -178,6 +178,16 @@ class Api:
     *** Parameters not passed to update a domain will be reset to defaults ***
 
     """
+    if request['Type'].lower() == 'master':
+      if not request.has_key('SOA_Email'):
+        raise MissingRequiredArgument('SOA_Email')
+    elif request['Type'].lower() == 'slave':
+      if not request.has_key('Master_IPs'):
+        raise MissingRequiredArgument('Master_IPs')
+    else:
+      raise Exception('Type is not master or slave')
+
+    return request
 
   @__api_required('DomainID')
   @__api_request
@@ -258,12 +268,26 @@ class Api:
   @__api_required('DomainID')
   @__api_request
   def domainDelete(self, request):
-    """Delete a specific domain/zone"""
+    """Delete a specific domain/zone
 
-  @__api_required('DomainID')
+    Parameters:
+      DomainID      - The unique identifier for this Domain/Zone
+
+    Returns DOMAINID
+
+    """
+
+  @__api_required('ResourceID')
   @__api_request
   def domainResourceDelete(self, request):
-    """Delete a specific resource record (RR)."""
+    """Delete a specific resource record (RR).
+
+    Parameters:
+      ResourceID    - The unique identifier for this Resource Record
+
+    Returns RESOURCEID
+
+    """
 
   @__api_request
   def linodeList(self, request):
@@ -286,53 +310,3 @@ class Api:
       * This is still an undocumented API call
       
     """
-
-if __name__ == "__main__":
-  from getpass import getpass
-  import readline
-  import atexit
-  import os
-
-  valid_commands = []
-  for c in dir(Api):
-    if c[0] != '_':
-      valid_commands.append(c)
-
-  valid_commands.append('help')
-  valid_commands.append('exit')
-
-  def complete(text, state):
-    results = [x for x in valid_commands if x.startswith(text)] + [None]
-    return results[state]
-
-  readline.set_completer(complete)
-  readline.parse_and_bind("tab: complete")
-  
-  histfile = os.path.expanduser('~/.linode-console-history')
-  if hasattr(readline, "read_history_file"):
-    try:
-      readline.read_history_file(histfile)
-    except IOError:
-      pass
-      atexit.register(readline.write_history_file, histfile)
-
-  key = getpass('Enter API Key: ')
-  lapi = Api(key)
-  quitting = False
-  
-  while not quitting:
-    command = raw_input('> ')
-    if command.lower() == 'exit':
-      quitting = True
-    elif command.lower() == 'help':
-      print ' '.join(valid_commands)
-    elif hasattr(lapi, command):
-      params = raw_input('Enter named parameters (name:param[,name2:param2]): ')
-      method = getattr(lapi, command)
-      keywords = {}
-      if params != '':
-        for p in params.split(','):
-          a = p.split(':')
-          keywords[a[0]] = a[1]
-      ret = method(keywords)
-      print simplejson.dumps(ret, indent=2)
