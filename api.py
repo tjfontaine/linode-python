@@ -255,6 +255,16 @@ class Api:
 
     """
 
+  @__api_required('DomainID')
+  @__api_request
+  def domainDelete(self, request):
+    """Delete a specific domain/zone"""
+
+  @__api_required('DomainID')
+  @__api_request
+  def domainResourceDelete(self, request):
+    """Delete a specific resource record (RR)."""
+
   @__api_request
   def linodeList(self, request):
     """Retrieve the list of Linodes visible to the user.
