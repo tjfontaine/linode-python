@@ -53,11 +53,12 @@ class ApiInfo:
   valid_params   = {}
 
 class Api:
-  def __init__(self, key):
+  def __init__(self, key, debug=False):
     self.__key = key
     self.__url = 'http://beta.linode.com/api/'
     self.__urlopen = urllib2.urlopen
     self.__request = urllib2.Request
+    self.__debug = debug
 
   @staticmethod
   def valid_commands():
@@ -71,9 +72,13 @@ class Api:
     request['api_key'] = self.__key
     request['resultFormat'] = 'json'
     request = urllib.urlencode(request)
+    if self.__debug:
+      print 'Sending '+request
     req = self.__request(self.__url,request)
     response = self.__urlopen(req)
     response = response.read()
+    if self.__debug:
+      print 'Received '+response
     json = simplejson.loads(response)
     if len(json['ERRORARRAY']) > 0:
       raise ApiError(json['ERRORARRAY'])
@@ -89,7 +94,7 @@ class Api:
       if not ApiInfo.valid_commands.has_key(func.__name__):
         ApiInfo.valid_commands[func.__name__] = True
 
-      def wrapper(self, mparams = {}, *args ,**__kw):
+      def wrapper(self, mparams = {}, *__args ,**__kw):
         request = {'action' : func.__name__}
 
         if len(mparams) == 0: #only self, no passed parameters

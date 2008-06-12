@@ -106,7 +106,12 @@ if __name__ == "__main__":
           sys.exit(2)
 
         params[param.replace('--', '')] = value
-      print simplejson.dumps(func(params), indent=2)
+      try:
+        print simplejson.dumps(func(params), indent=2)
+      except api.MissingRequiredArgument, mra:
+        print 'Missing option --'+mra.value
+        usage()
+        sys.exit(2)
     else:
       if not command == 'help':
         print 'Invalid action '+optlist[0][0]
