@@ -31,6 +31,7 @@ import urllib
 import urllib2
 import simplejson
 
+
 class MissingRequiredArgument(Exception):
   """Raised when a required parameter is missing."""
   
@@ -47,12 +48,24 @@ class ApiError(Exception):
   def __str__(self):
     return repr(self.value)
 
+class ApiInfo:
+  valid_commands = {}
+  valid_params   = {}
+
 class Api:
   def __init__(self, key):
     self.__key = key
     self.__url = 'http://beta.linode.com/api/'
     self.__urlopen = urllib2.urlopen
     self.__request = urllib2.Request
+
+  @staticmethod
+  def valid_commands():
+    return ApiInfo.valid_commands
+
+  @staticmethod
+  def valid_params():
+    return ApiInfo.valid_params
 
   def __send_request(self, request):
     request['api_key'] = self.__key
@@ -66,45 +79,47 @@ class Api:
       raise ApiError(json['ERRORARRAY'])
     return json['DATA']
 
-  def __simple_decorator(decorator):
-    def new_decorator(f):
-      g = decorator(f)
-      g.__name__ = f.__name__
-      g.__doc__ = f.__doc__
-      g.__dict__.update(f.__dict__)
-      return g
-    new_decorator.__name__ = decorator.__name__
-    new_decorator.__doc__ = decorator.__doc__
-    new_decorator.__dict__.update(decorator.__dict__)
-    return new_decorator
+  def __api_request(*args, **kw):
+    for k in args:
+      k = k.lower()
+      if not ApiInfo.valid_params.has_key(k):
+        ApiInfo.valid_params[k] = True
 
-  @__simple_decorator
-  def __api_request(func):
-    def decorator(self, *__args, **__kw):
-      request = {'action' : func.__name__}
-      for k in __kw: request[k] = __kw[k]
-      if len(__args) == 1:
-        for k in __args[0]: request[k] = __args[0][k]
-      result = func(self, request)
-      if result is not None:
-        request = result
-      return self.__send_request(request)
-    return decorator
-
-  def __api_required(*args, **kw):
     def decorator(func):
-      def wrapper(*__args,**__kw):
+      if not ApiInfo.valid_commands.has_key(func.__name__):
+        ApiInfo.valid_commands[func.__name__] = True
+
+      def wrapper(self, mparams = {}, *args ,**__kw):
+        request = {'action' : func.__name__}
+
+        if len(mparams) == 0: #only self, no passed parameters
+          params = __kw
+        else: #parameters passed, expect a dict
+          params = mparams
+
         for k in args:
-          if (not __kw.has_key(k) and len(__args) == 1) or (len(__args) == 2 and not __args[1].has_key(k)):
+          k = k.lower()
+
+          if not params.has_key(k):
             raise MissingRequiredArgument(k)
-        return func(*__args,**__kw)
+
+        for k in params:
+          k = k.lower()
+          request[k] = params[k]
+
+        result = func(self, request)
+        if result is not None:
+          request = result
+
+        return self.__send_request(request)
+
       wrapper.__name__ = func.__name__
       wrapper.__doc__ = func.__doc__
       wrapper.__dict__.update(func.__dict__)
       return wrapper
     return decorator
 
-  @__api_request
+  @__api_request()
   def domainList(self, request):
     """Retrieve the list of domains visible to the user.
 
@@ -133,8 +148,7 @@ class Api:
     
     """
 
-  @__api_required('DomainID')
-  @__api_request
+  @__api_request('DomainID')
   def domainGet(self, request):
     """Retrieve the details for a specific domain.
 
@@ -147,8 +161,7 @@ class Api:
     
     """
 
-  @__api_required('DomainID', 'Domain', 'Type', 'Status')
-  @__api_request
+  @__api_request('DomainID', 'Domain', 'Type', 'Status', 'SOA_Email', 'Master_IPs', 'Refresh_Sec', 'Retry_Sec', 'TTL_Sec')
   def domainSave(self, request):
     """Create or update a specific domain.
 
@@ -189,8 +202,7 @@ class Api:
 
     return request
 
-  @__api_required('DomainID')
-  @__api_request
+  @__api_request('DomainID')
   def domainResourceList(self, request):
     """Retrieve the list of resource records (RRs) for a specific domain.
     
@@ -223,8 +235,7 @@ class Api:
     
     """
 
-  @__api_required('ResourceID')
-  @__api_request
+  @__api_request('ResourceID')
   def domainResourceGet(self, request):
     """Retrieve the details for a specific resource record (RR).
 
@@ -237,8 +248,7 @@ class Api:
       
     """
 
-  @__api_required('ResourceID', 'DomainID')
-  @__api_request
+  @__api_request('ResourceID', 'DomainID', 'Name', 'Type', 'Target', 'Priority', 'TTL_Sec', 'Weight', 'Port')
   def domainResourceSave(self, request):
     """Create or update a specific resource record (RR).
     
@@ -265,8 +275,7 @@ class Api:
 
     """
 
-  @__api_required('DomainID')
-  @__api_request
+  @__api_request('DomainID')
   def domainDelete(self, request):
     """Delete a specific domain/zone
 
@@ -277,8 +286,7 @@ class Api:
 
     """
 
-  @__api_required('ResourceID')
-  @__api_request
+  @__api_request('ResourceID')
   def domainResourceDelete(self, request):
     """Delete a specific resource record (RR).
 
@@ -289,7 +297,7 @@ class Api:
 
     """
 
-  @__api_request
+  @__api_request()
   def linodeList(self, request):
     """Retrieve the list of Linodes visible to the user.
     
