@@ -82,7 +82,7 @@ class Api:
 
     return self.__batching
 
-  def flush(self):
+  def batchFlush(self):
     if not self.__batching:
       raise Exception('Cannot flush requests when not batching')
 
@@ -128,6 +128,8 @@ class Api:
           params = __kw
         else: #parameters passed, expect a dict
           params = mparams
+
+        params = dict([(key.lower(),value) for key,value in params.iteritems()])
 
         for k in args:
           k = k.lower()
