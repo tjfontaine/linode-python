@@ -103,7 +103,7 @@ class Api:
     if self.__debug:
       print 'Received '+response
     json = simplejson.loads(response)
-    if json is dict:
+    if type(json) is dict:
       if len(json['ERRORARRAY']) > 0:
         raise ApiError(json['ERRORARRAY'])
       else:
