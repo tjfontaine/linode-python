@@ -53,7 +53,7 @@ class LinodeConsole(code.InteractiveConsole):
 class LinodeComplete(rlcompleter.Completer):
   def complete(self, text, state):
     result = rlcompleter.Completer.complete(self, text, state)
-    if result and result.find('_') > -1:
+    if result and result.find('__') > -1:
       result = ''
     return result
 
@@ -61,17 +61,64 @@ class LinodeComplete(rlcompleter.Completer):
 if __name__ == "__main__":
   from getpass import getpass
   from os import environ
+  import getopt, sys
+  import simplejson
 
   if environ.has_key('LINODE_API_KEY'):
     key = environ['LINODE_API_KEY']
   else:
     key = getpass('Enter API Key: ')
   linode = api.Api(key)
-  console = LinodeConsole()
 
-  console.runcode('import readline,rlcompleter,api,shell,simplejson')
-  console.runcode('readline.parse_and_bind("tab: complete")')
-  console.runcode('readline.set_completer(shell.LinodeComplete().complete)')
-  console.runcode('def pp(text=None): print simplejson.dumps(text, indent=2)')
-  console.locals.update({'linode':linode})
-  console.interact()
+  def usage():
+    print 'shell.py --<api action> [--parameter1=value [--parameter2=value [...]]]'
+    print 'Valid Actions'
+    for a in sorted(linode.valid_commands().keys()):
+      print '\t--'+a
+    print 'Valid Named Parameters'
+    for a in sorted(linode.valid_params().keys()):
+      print '\t--'+a+'='
+
+  options = []
+  for arg in linode.valid_params().keys():
+    options.append(arg+'=')
+
+  for arg in linode.valid_commands().keys():
+    options.append(arg)
+  options.append('help')
+
+  if len(sys.argv[1:]) > 0:
+    try:
+      optlist, args = getopt.getopt(sys.argv[1:], '', options)
+    except getopt.GetoptError, err:
+      print str(err)
+      usage()
+      sys.exit(2)
+
+    command = optlist[0][0].replace('--', '')
+
+    if hasattr(linode, command):
+      func = getattr(linode, command)
+      params = {}
+      for param,value in optlist[1:]:
+        if param.replace('--', '') == 'help':
+          usage()
+          sys.exit(2)
+
+        params[param.replace('--', '')] = value
+      print simplejson.dumps(func(params), indent=2)
+    else:
+      if not command == 'help':
+        print 'Invalid action '+optlist[0][0]
+
+      usage()
+      sys.exit(2)
+  else:
+    console = LinodeConsole()
+
+    console.runcode('import readline,rlcompleter,api,shell,simplejson')
+    console.runcode('readline.parse_and_bind("tab: complete")')
+    console.runcode('readline.set_completer(shell.LinodeComplete().complete)')
+    console.runcode('def pp(text=None): print simplejson.dumps(text, indent=2)')
+    console.locals.update({'linode':linode})
+    console.interact()
