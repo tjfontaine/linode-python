@@ -53,12 +53,14 @@ class ApiInfo:
   valid_params   = {}
 
 class Api:
-  def __init__(self, key, debug=False):
+  def __init__(self, key, debug=False, batching=False):
     self.__key = key
     self.__url = 'http://beta.linode.com/api/'
     self.__urlopen = urllib2.urlopen
     self.__request = urllib2.Request
     self.__debug = debug
+    self.__batching = batching
+    self.__batch_cache = []
 
   @staticmethod
   def valid_commands():
@@ -67,6 +69,27 @@ class Api:
   @staticmethod
   def valid_params():
     return ApiInfo.valid_params
+
+  def debug(self, value = None):
+    if value is not None:
+      self.__debug = value
+
+    return self.__debug
+
+  def batching(self, value = None):
+    if value is not None:
+      self.__batching = value
+
+    return self.__batching
+
+  def flush(self):
+    if not self.__batching:
+      raise Exception('Cannot flush requests when not batching')
+
+    json = simplejson.dumps(self.__batch_cache)
+    self.__batch_cache = []
+    request = { 'action' : 'batch', 'requestArray' : json }
+    return self.__send_request(request)
 
   def __send_request(self, request):
     request['api_key'] = self.__key
@@ -80,9 +103,13 @@ class Api:
     if self.__debug:
       print 'Received '+response
     json = simplejson.loads(response)
-    if len(json['ERRORARRAY']) > 0:
-      raise ApiError(json['ERRORARRAY'])
-    return json['DATA']
+    if json is dict:
+      if len(json['ERRORARRAY']) > 0:
+        raise ApiError(json['ERRORARRAY'])
+      else:
+        return json['DATA']
+    else:
+      return json
 
   def __api_request(*args, **kw):
     for k in args:
@@ -116,7 +143,13 @@ class Api:
         if result is not None:
           request = result
 
-        return self.__send_request(request)
+        if self.__batching:
+          self.__batch_cache.append(request)
+          if self.__debug:
+            print 'Batched: '+simplejson.dumps(request)
+          return True
+        else:
+          return self.__send_request(request)
 
       wrapper.__name__ = func.__name__
       wrapper.__doc__ = func.__doc__
