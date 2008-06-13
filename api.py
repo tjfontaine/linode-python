@@ -111,8 +111,13 @@ class Api:
     else:
       return json
 
-  def __api_request(*args, **kw):
-    for k in args:
+  def __api_request(required = [], optional = []):
+    for k in required:
+      k = k.lower()
+      if not ApiInfo.valid_params.has_key(k):
+        ApiInfo.valid_params[k] = True
+
+    for k in optional:
       k = k.lower()
       if not ApiInfo.valid_params.has_key(k):
         ApiInfo.valid_params[k] = True
@@ -131,7 +136,7 @@ class Api:
 
         params = dict([(key.lower(),value) for key,value in params.iteritems()])
 
-        for k in args:
+        for k in required:
           k = k.lower()
 
           if not params.has_key(k):
@@ -188,7 +193,7 @@ class Api:
     
     """
 
-  @__api_request('DomainID')
+  @__api_request(['DomainID'])
   def domainGet(self, request):
     """Retrieve the details for a specific domain.
 
@@ -201,7 +206,7 @@ class Api:
     
     """
 
-  @__api_request('DomainID', 'Domain', 'Type', 'Status', 'SOA_Email', 'Master_IPs', 'Refresh_Sec', 'Retry_Sec', 'TTL_Sec')
+  @__api_request(['DomainID', 'Domain', 'Type', 'Status'], ['SOA_Email', 'Master_IPs', 'Refresh_Sec', 'Retry_Sec', 'TTL_Sec'])
   def domainSave(self, request):
     """Create or update a specific domain.
 
@@ -231,18 +236,19 @@ class Api:
     *** Parameters not passed to update a domain will be reset to defaults ***
 
     """
-    if request['Type'].lower() == 'master':
-      if not request.has_key('SOA_Email'):
-        raise MissingRequiredArgument('SOA_Email')
-    elif request['Type'].lower() == 'slave':
-      if not request.has_key('Master_IPs'):
-        raise MissingRequiredArgument('Master_IPs')
+    print request
+    if request['type'].lower() == 'master':
+      if not request.has_key('soa_email'):
+        raise MissingRequiredArgument('soa_email')
+    elif request['type'].lower() == 'slave':
+      if not request.has_key('master_ips'):
+        raise MissingRequiredArgument('master_ips')
     else:
-      raise Exception('Type is not master or slave')
+      raise Exception('Zone Type is not master or slave')
 
     return request
 
-  @__api_request('DomainID')
+  @__api_request(['DomainID'])
   def domainResourceList(self, request):
     """Retrieve the list of resource records (RRs) for a specific domain.
     
@@ -275,7 +281,7 @@ class Api:
     
     """
 
-  @__api_request('ResourceID')
+  @__api_request(['ResourceID'])
   def domainResourceGet(self, request):
     """Retrieve the details for a specific resource record (RR).
 
@@ -288,7 +294,7 @@ class Api:
       
     """
 
-  @__api_request('ResourceID', 'DomainID', 'Name', 'Type', 'Target', 'Priority', 'TTL_Sec', 'Weight', 'Port')
+  @__api_request(['ResourceID', 'DomainID', 'Type', 'Target'], ['Name', 'Priority', 'TTL_Sec', 'Weight', 'Port'])
   def domainResourceSave(self, request):
     """Create or update a specific resource record (RR).
     
@@ -315,7 +321,7 @@ class Api:
 
     """
 
-  @__api_request('DomainID')
+  @__api_request(['DomainID'])
   def domainDelete(self, request):
     """Delete a specific domain/zone
 
@@ -326,7 +332,7 @@ class Api:
 
     """
 
-  @__api_request('ResourceID')
+  @__api_request(['ResourceID'])
   def domainResourceDelete(self, request):
     """Delete a specific resource record (RR).
 
