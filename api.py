@@ -52,10 +52,11 @@ class ApiInfo:
   valid_commands = {}
   valid_params   = {}
 
+LINODE_API_URL = 'https://api.linode.com/api/'
+
 class Api:
   def __init__(self, key, debug=False, batching=False):
     self.__key = key
-    self.__url = 'http://beta.linode.com/api/'
     self.__urlopen = urllib2.urlopen
     self.__request = urllib2.Request
     self.__debug = debug
@@ -97,7 +98,7 @@ class Api:
     request = urllib.urlencode(request)
     if self.__debug:
       print 'Sending '+request
-    req = self.__request(self.__url,request)
+    req = self.__request(LINODE_API_URL, request)
     response = self.__urlopen(req)
     response = response.read()
     if self.__debug:
