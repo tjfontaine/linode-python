@@ -237,7 +237,8 @@ class Api:
     *** Parameters not passed to update a domain will be reset to defaults ***
 
     """
-    print request
+    if self.__debug
+      print request
     if request['type'].lower() == 'master':
       if not request.has_key('soa_email'):
         raise MissingRequiredArgument('soa_email')
