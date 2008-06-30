@@ -65,11 +65,11 @@ class Api:
 
   @staticmethod
   def valid_commands():
-    return ApiInfo.valid_commands
+    return ApiInfo.valid_commands.keys()
 
   @staticmethod
   def valid_params():
-    return ApiInfo.valid_params
+    return ApiInfo.valid_params.keys()
 
   def debuging(self, value = None):
     if value is not None:

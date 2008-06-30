@@ -68,22 +68,27 @@ if __name__ == "__main__":
     key = environ['LINODE_API_KEY']
   else:
     key = getpass('Enter API Key: ')
-  linode = api.Api(key)
+
+  try:
+    import highlevel
+    linode = highlevel.HighLevel(key)
+  except:
+    linode = api.Api(key)
 
   def usage():
     print 'shell.py --<api action> [--parameter1=value [--parameter2=value [...]]]'
     print 'Valid Actions'
-    for a in sorted(linode.valid_commands().keys()):
+    for a in sorted(linode.valid_commands()):
       print '\t--'+a
     print 'Valid Named Parameters'
-    for a in sorted(linode.valid_params().keys()):
+    for a in sorted(linode.valid_params()):
       print '\t--'+a+'='
 
   options = []
-  for arg in linode.valid_params().keys():
+  for arg in linode.valid_params():
     options.append(arg+'=')
 
-  for arg in linode.valid_commands().keys():
+  for arg in linode.valid_commands():
     options.append(arg)
   options.append('help')
 
@@ -110,6 +115,7 @@ if __name__ == "__main__":
         print simplejson.dumps(func(params), indent=2)
       except api.MissingRequiredArgument, mra:
         print 'Missing option --'+mra.value
+        print ''
         usage()
         sys.exit(2)
     else:
