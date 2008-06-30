@@ -71,11 +71,15 @@ class Api:
   def valid_params():
     return ApiInfo.valid_params
 
-  def debug(self, value = None):
+  def debuging(self, value = None):
     if value is not None:
       self.__debug = value
 
     return self.__debug
+
+  def debug(self, msg):
+    if self.__debug:
+      print msg
 
   def batching(self, value = None):
     if value is not None:
@@ -96,13 +100,11 @@ class Api:
     request['api_key'] = self.__key
     request['resultFormat'] = 'json'
     request = urllib.urlencode(request)
-    if self.__debug:
-      print 'Sending '+request
+    self.debug('Sending '+request)
     req = self.__request(LINODE_API_URL, request)
     response = self.__urlopen(req)
     response = response.read()
-    if self.__debug:
-      print 'Received '+response
+    self.debug('Received '+response)
     json = simplejson.loads(response)
     if type(json) is dict:
       if len(json['ERRORARRAY']) > 0:
@@ -153,9 +155,7 @@ class Api:
 
         if self.__batching:
           self.__batch_cache.append(request)
-          if self.__debug:
-            print 'Batched: '+simplejson.dumps(request)
-          return True
+          self.debug('Batched: '+simplejson.dumps(request))
         else:
           return self.__send_request(request)
 
@@ -237,8 +237,7 @@ class Api:
     *** Parameters not passed to update a domain will be reset to defaults ***
 
     """
-    if self.__debug:
-      print request
+    self.debug(request)
     if request['type'].lower() == 'master':
       if not request.has_key('soa_email'):
         raise MissingRequiredArgument('soa_email')
