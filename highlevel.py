@@ -59,7 +59,7 @@ class HighLevel(api.Api):
   def invalidates_cache(func):
     def wrapper(self, *args, **kw):
       self.__domain_cache_valid = False
-      return func(self, args, kw)
+      return func(self, *args, **kw)
     wrapper.__name__ = func.__name__
     wrapper.__doc__  = func.__doc__
     wrapper.__dict__.update(func.__dict__)
@@ -69,7 +69,7 @@ class HighLevel(api.Api):
     def wrapper(self, *args, **kw):
       if not self.__domain_cache_valid:
         self.update_domain_cache()
-      return func(self, args, kw)
+      return func(self, *args, **kw)
     wrapper.__name__ = func.__name__
     wrapper.__doc__  = func.__doc__
     wrapper.__dict__.update(func.__dict__)
@@ -129,30 +129,72 @@ class HighLevel(api.Api):
           self.__domain_cache_name[self.__domain_cache_id[rr['DOMAINID']]]['rr'][rr['NAME']] = rr
       self.batching(False)
   
-  @__api_request(['DomainName'])
+  @__api_request(['Domain'])
   @requires_cache
-  def domainGetByName(self, args, kw):
+  def domainGetByName(self, params):
     """Retrieve a domain by a zone name
     Parameters:
-      DomainName
+      Domain
 
     Returns the same as domainGet
     """
-    l = args[0]
-    return self.__domain_cache_name[l['domainname']]
+    return self.__domain_cache_name[params['domain']]
 
-  @__api_request(['DomainName', 'Name'])
+  @__api_request(['Domain', 'Name'])
   @requires_cache
-  def domainResourceGetByName(self, args, kw):
+  def domainResourceGetByName(self, params):
     """Retrieve a resource record by a zone and dns name
 
     Parameters:
-      DomainName Name
+      Domain Name
 
     Returns the same as domainResourceGet
     """
-    l = args[0]
-    return self.__domain_cache_name[l['domainname']]['rr'][l['name']]
+    return self.__domain_cache_name[params['domain']]['rr'][params['name']]
 
-  def get_cache(self):
-    return self.__domain_cache
+  @__api_request(['Domain'])
+  @requires_cache
+  @invalidates_cache
+  def domainUpdate(self, params):
+    """Update a specific domain
+
+    Parameters:
+      Same parameters as domainSave
+
+    If you don't include a
+    """
+    domain = self.__domain_cache_name[params['domain']]
+    for k,v in domain.iteritems():
+      if k != 'rr' and not params.has_key(k.lower()):
+        params[k] = v
+    return api.Api.domainSave(self, params)
+
+  @__api_request(['Domain', 'Name'])
+  @requires_cache
+  @invalidates_cache
+  def domainResourceUpdate(self, params):
+    resource = self.__domain_cache_name[params['domain']]['rr'][params['name']]
+    for k,v in resource.iteritems():
+      if not params.has_key(k.lower()):
+        params[k] = v
+    return api.Api.domainResourceSave(self, params)
+
+  @invalidates_cache
+  def domainSave(self, *args, **kw):
+    api.Api.domainSave(self, *args, **kw)
+  domainSave.__doc__ = api.Api.domainSave.__doc__
+
+  @invalidates_cache
+  def domainResourceSave(self, *args, **kw):
+    api.Api.domainResourceSave(self, *args, **kw)
+  domainResourceSave.__doc__ = api.Api.domainResourceSave.__doc__
+
+  @invalidates_cache
+  def domainDelete(self, *args, **kw):
+    api.Api.domainDelete(self, *args, **kw)
+  domainDelete.__doc__ = api.Api.domainDelete.__doc__
+
+  @invalidates_cache
+  def domainResourceDelete(self, *args, **kw):
+    api.Api.domainResourceDelete(self, *args, **kw)
+  domainResourceDelete.__doc__ = api.Api.domainResourceDelete.__doc__
