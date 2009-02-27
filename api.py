@@ -228,7 +228,7 @@ class Api:
         * Excluding or setting to zero indicates default time (2 hours)
       Retry_Sec      - 'retry' value for the domain
         * Excluding or setting to zero indicates default time (2 hours)
-      TTK_Sec        - 'ttl' value for the domain
+      TTL_Sec        - 'ttl' value for the domain
         * Excluding or setting to zero indicates default time (1 day)
 
     Returned fields:
@@ -295,7 +295,7 @@ class Api:
       
     """
 
-  @__api_request(['ResourceID', 'DomainID', 'Type', 'Target'], ['Name', 'Priority', 'TTL_Sec', 'Weight', 'Port'])
+  @__api_request(['ResourceID', 'DomainID', 'Type', 'Target', 'Name'], ['Priority', 'TTL_Sec', 'Weight', 'Port'])
   def domainResourceSave(self, request):
     """Create or update a specific resource record (RR).
     
