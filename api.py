@@ -207,7 +207,7 @@ class Api:
     
     """
 
-  @__api_request(['DomainID', 'Domain', 'Type', 'Status'], ['SOA_Email', 'Master_IPs', 'Refresh_Sec', 'Retry_Sec', 'TTL_Sec'])
+  @__api_request(['DomainID', 'Domain', 'Type', 'Status', 'SOA_Email'], ['Master_IPs', 'Refresh_Sec', 'Retry_Sec', 'TTL_Sec'])
   def domainSave(self, request):
     """Create or update a specific domain.
 
