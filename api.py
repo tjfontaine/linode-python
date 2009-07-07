@@ -290,13 +290,13 @@ class Api:
     pass
 
   @__api_request(optional=['isXen'])
-  def kernel_list(self, request):
+  def avail_kernels(self, request):
     pass
 
   @__api_request()
-  def distribution_list(self, request):
+  def avail_distributions(self, request):
     pass
 
   @__api_request()
-  def datacenter_list(self, request):
+  def avail_datacenters(self, request):
     pass
