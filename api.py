@@ -234,11 +234,10 @@ class Api:
   def linode_config_update(self, request):
     pass
 
-  @__api_request(required=['LinodeID', 'KernelID'], optional=[
-                                                            'Label',
+  @__api_request(required=['LinodeID', 'KernelID', 'Label', 'Disklist'],
+                                                 optional=[
                                                             'Comments',
                                                             'RAMLimit',
-                                                            'DiskList',
                                                             'RunLevel',
                                                             'RootDeviceNum',
                                                             'RootDeviceCustom',
