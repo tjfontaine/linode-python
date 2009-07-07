@@ -123,7 +123,8 @@ class LinodeDisk(LinodeObject):
   fields = {
     'id'      : ('DiskID', int, None),
     'linode'  : ('LinodeID', int, None),
-    'type'    : ('Type', int, None),
+    'type'    : ('Type', str, None),
+    'size'    : ('Size', int, None),
     'name'    : ('Label', str, None),
     'label'   : ('Label', str, None),
   }
