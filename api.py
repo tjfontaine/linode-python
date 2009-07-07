@@ -261,7 +261,7 @@ class Api:
   def linode_disk_update(self, request):
     pass
 
-  @__api_request(required=['LinodeID', 'Type', 'Size'], optional=['Label', 'isReadOnly'])
+  @__api_request(required=['LinodeID', 'Type', 'Size', 'Label'], optional=['isReadOnly'])
   def linode_disk_create(self, request):
     pass
 
