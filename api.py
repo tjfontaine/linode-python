@@ -99,7 +99,7 @@ class Api:
 
   def __send_request(self, request):
     request['api_key'] = self.__key
-    request['api_resultFormat'] = 'json'
+    request['api_responseFormat'] = 'json'
     request = urllib.urlencode(request)
     self.debug('Sending '+request)
     req = self.__request(LINODE_API_URL, request)
