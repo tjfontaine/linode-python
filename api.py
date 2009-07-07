@@ -55,6 +55,47 @@ class ApiInfo:
 
 LINODE_API_URL = 'https://beta.linode.com/api/'
 
+class LowerCaseDict(dict):
+  def __init__(self, copy=None):
+    if copy:
+      if isinstance(copy, dict):
+        for k,v in copy.items():
+          dict.__setitem__(self, k.lower(), v)
+      else:
+        for k,v in copy:
+          dict.__setitem__(self, k.lower(), v)
+
+  def __getitem__(self, key):
+    return dict.__getitem__(self, key.lower())
+
+  def __setitem__(self, key, value):
+    dict.__setitem__(self, key.lower(), value)
+
+  def __contains__(self, key):
+    return dict.__contains__(self, key.lower())
+
+  def has_key(self, key):
+    return dict.has_key(self, key.lower())
+
+  def get(self, key, def_val=None):
+    return dict.get(self, key.lower(), def_val)
+
+  def setdefault(self, key, def_val=None):
+    return dict.setdefault(self, key.lower(), def_val)
+
+  def update(self, copy):
+    for k,v in copy.items():
+      dict.__setitem__(self, k.lower(), v)
+
+  def fromkeys(self, iterable, value=None):
+    d = self.__class__()
+    for k in iterable:
+      dict.__setitem__(d, k.lower(), value)
+    return d
+
+  def pop(self, key, def_val=None):
+    return dict.pop(self, key.lower(), def_val)
+
 class Api:
   def __init__(self, key, debug=False, batching=False):
     self.__key = key
@@ -118,7 +159,7 @@ class Api:
       else:
         return json['DATA']
     else:
-      return json
+      return LowerCaseDict(json)
 
   def __api_request(required = [], optional = []):
     for k in required:
