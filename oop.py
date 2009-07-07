@@ -16,7 +16,66 @@ def unbool(value):
   else:
     return 0
 
-class Linode(object):
+class LinodeObject(object):
+  def __init__(self, entry={}):
+    self.__entry = dict([(str(k).lower(),v) for k,v in entry.items()])
+
+  def __getattr__(self, name):
+    name = name.replace('_LinodeObject', '')
+    if name == '__entry':
+      return self.__dict__[name]
+    elif not self.fields.has_key(name):
+      raise AttributeError
+    else:
+      field, conversion, deconvert = self.fields[name]
+      value = None
+      if self.__entry.has_key(field.lower()):
+        value = self.__entry[field.lower()]
+        if conversion:
+          value = conversion(value)
+      return value
+
+  def __setattr__(self, name, value):
+    name = name.replace('_LinodeObject', '')
+    if name == '__entry':
+      object.__setattr__(self, name, value)
+    elif not self.fields.has_key(name):
+      raise AttributeError
+    else:
+      field, conversion, deconvert = self.fields[name]
+      if deconvert:
+        value = deconvert(value)
+      elif conversion:
+        value = conversion(value)
+      self.__entry[field.lower()] = value
+
+  def save(self):
+    if self.id:
+      self.update()
+    else:
+      self.create_method(**self.__entry)
+
+  def update(self):
+    self.update_method(**self.__entry)
+
+  @classmethod
+  def list(self, **kw):
+    kwargs = {}
+    for k, v in kw.items():
+      f, c, d = self.fields[k.lower()]
+      kwargs[f] = v
+    for l in self.list_method(**kwargs):
+      yield self(l)
+
+  @classmethod
+  def get(self, **kw):
+    kwargs = {}
+    for k, v in kw.items():
+      f, c, d = self.fields[k.lower()]
+      kwargs[f] = v
+    return self(self.list_method(**kwargs)[0])
+
+class Linode(LinodeObject):
   fields = {
     'id'                : ('LinodeID', int, None),
     'name'              : ('Label', str, None),
@@ -37,46 +96,9 @@ class Linode(object):
     'watchdog'          : ('watchdog', bool, unbool),
   }
 
-  def __init__(self, entry={}):
-    self.__entry = dict([(str(k).lower(),v) for k,v in entry.items()])
-
-  def __getattr__(self, name):
-    name = name.replace('_Linode', '')
-    if name == '__entry':
-      return self.__dict__[name]
-    elif not self.fields.has_key(name):
-      raise AttributeError
-    else:
-      field, conversion, deconvert = self.fields[name]
-      value = None
-      if self.__entry.has_key(field.lower()):
-        value = self.__entry[field.lower()]
-        if conversion:
-          value = conversion(value)
-      return value
-
-  def __setattr__(self, name, value):
-    name = name.replace('_Linode', '').lower()
-    if name == '__entry':
-      object.__setattr__(self, name, value)
-    elif not self.fields.has_key(name):
-      raise AttributeError
-    else:
-      field, conversion, deconvert = self.fields[name]
-      if deconvert:
-        value = deconvert(value)
-      elif conversion:
-        value = conversion(value)
-      self.__entry[field.lower()] = value
-
-  def save(self):
-    if self.id:
-      self.update()
-    else:
-      _api.linode_create(**self.__entry)
-
-  def update(self):
-    _api.linode_update(**self.__entry)
+  update_method = _api.linode_update
+  create_method = _api.linode_create
+  list_method   = _api.linode_list
 
   def boot(self):
     _api.linode_boot(linodeid=self.id)
@@ -90,11 +112,25 @@ class Linode(object):
   def delete(self):
     _api.linode_delete(linodeid=self.id)
 
-  @staticmethod
-  def list():
-    for l in _api.linode_list():
-      yield Linode(l)
+class LinodeDisk(LinodeObject):
+  fields = {
+    'id'      : ('DiskID', int, None),
+    'linode'  : ('LinodeID', int, None),
+    'type'    : ('Type', int, None),
+    'name'    : ('Label', str, None),
+    'label'   : ('Label', str, None),
+  }
 
-  @staticmethod
-  def get(id):
-    return Linode(_api.linode_list(linodeid=id)[0])
+  update_method = _api.linode_disk_update
+  create_method = _api.linode_disk_create
+  list_method   = _api.linode_disk_list
+
+  def duplicate(self):
+    ret = _api.linode_disk_duplicate(linodeid=self.linode, diskid=self.id)
+    return LinodeDisk(LinodeDisk.get(linode=self.linode, id=ret['DISKID']))
+
+  def resize(self, size):
+    _api.linode_disk_resize(linodeid=self.linode, diskid=self.id, size=size)
+
+  def delete(self):
+    _api.linode_disk_delete(linodeid=self.linode, diskid=self.id)
