@@ -3,7 +3,7 @@
 A Python library to perform low-level Linode API functions.
 
 Copyright (c) 2009 Timothy J Fontaine <tjfontaine@gmail.com>
-Copyright (c) 2009 Ryan Tucker 
+Copyright (c) 2009 Ryan Tucker <rtucker@gmail.com>
 Copyright (c) 2008 James C Sinclair <james@irgeek.com>
 
 Permission is hereby granted, free of charge, to any person
