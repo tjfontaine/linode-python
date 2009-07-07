@@ -71,7 +71,7 @@ class Api:
   def valid_params():
     return ApiInfo.valid_params.keys()
 
-  def debuging(self, value = None):
+  def debugging(self, value = None):
     if value is not None:
       self.__debug = value
 
