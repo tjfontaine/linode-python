@@ -213,3 +213,14 @@ class LinodeJob(LinodeObject):
   }
 
   list_method = _api.linode_job_list
+
+class LinodeIP(LinodeObject):
+  fields = {
+    'id'        : ('IPAddressID', int, None),
+    'linode'    : ('LinodeID', int, None),
+    'address'   : ('IPADDRESS', str, None),
+    'is_public' : ('ISPUBLIC', bool, unbool),
+    'rdns'      : ('RDNS_NAME', str, None),
+  }
+
+  list_method = _api.linode_ip_list
