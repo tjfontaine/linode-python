@@ -149,6 +149,7 @@ class LinodeConfig(LinodeObject):
     'id'                  : ('ConfigID', int, None),
     'linode'              : ('LinodeID', int, None),
     'kernel'              : ('KernelID', int, None),
+    'disklist'            : ('DISKLIST', lambda x: x.split(','), lambda x: ','.join(x)),
     'name'                : ('Label', str, None),
     'label'               : ('Label', str, None),
     'comments'            : ('Comments', str, None),
