@@ -17,6 +17,12 @@ def unbool(value):
     return 0
 
 class LinodeObject(object):
+  fields = None
+  update_method = None
+  create_method = None
+  primary_key   = None
+  list_method   = None
+
   def __init__(self, entry={}):
     self.__entry = dict([(str(k).lower(),v) for k,v in entry.items()])
 
@@ -53,7 +59,7 @@ class LinodeObject(object):
     if self.id:
       self.update()
     else:
-      self.create_method(**self.__entry)
+      self.id = self.create_method(**self.__entry)[self.primary_key]
 
   def update(self):
     self.update_method(**self.__entry)
@@ -98,6 +104,7 @@ class Linode(LinodeObject):
 
   update_method = _api.linode_update
   create_method = _api.linode_create
+  primary_key   = 'LinodeID'
   list_method   = _api.linode_list
 
   def boot(self):
@@ -123,14 +130,68 @@ class LinodeDisk(LinodeObject):
 
   update_method = _api.linode_disk_update
   create_method = _api.linode_disk_create
+  primary_key   = 'DiskID'
   list_method   = _api.linode_disk_list
 
   def duplicate(self):
     ret = _api.linode_disk_duplicate(linodeid=self.linode, diskid=self.id)
-    return LinodeDisk(LinodeDisk.get(linode=self.linode, id=ret['DISKID']))
+    return LinodeDisk(LinodeDisk.get(linode=self.linode, id=ret['DiskID']))
 
   def resize(self, size):
     _api.linode_disk_resize(linodeid=self.linode, diskid=self.id, size=size)
 
   def delete(self):
     _api.linode_disk_delete(linodeid=self.linode, diskid=self.id)
+
+class LinodeConfig(LinodeObject):
+  fields = {
+    'id'                  : ('ConfigID', int, None),
+    'linode'              : ('LinodeID', int, None),
+    'kernel'              : ('KernelID', int, None),
+    'name'                : ('Label', str, None),
+    'label'               : ('Label', str, None),
+    'comments'            : ('Comments', str, None),
+    'ram_limit'           : ('RAMLimit', int, None),
+    'root_device_num'     : ('RootDeviceNum', int, None),
+    'root_device_custom'  : ('RootDeviceCustom', int, None),
+    'root_device_readonly': ('RootDeviceRO', bool, unbool),
+    'disable_updatedb'    : ('helper_disableUpdateDB', bool, unbool),
+    'helper_xen'          : ('helper_xen', bool, unbool),
+    'helper_depmod'       : ('helper_depmod', bool, unbool),
+  }
+
+  update_method = _api.linode_config_update
+  create_method = _api.linode_config_create
+  primary_key   = 'ConfigID'
+  list_method   = _api.linode_config_list
+
+class Kernel(LinodeObject):
+  fields = {
+    'id'    : ('KernelID', int, None),
+    'label' : ('Label', str, None),
+    'name'  : ('Label', str, None),
+    'is_xen': ('IsXen', bool, unbool),
+  }
+
+  list_method = _api.avail_kernels
+
+class Distribution(LinodeObject):
+  fields = {
+    'id'        : ('DistributionID', int, None),
+    'label'     : ('Label', str, None),
+    'name'      : ('Label', str, None),
+    'min'       : ('MinImageSize', int, None),
+    'is_64bit'  : ('Is64Bit', bool, unbool),
+    'created'   : ('CREATE_DT', None, None),
+  }
+
+  list_method = _api.avail_distributions
+
+class Datacenter(LinodeObject):
+  fields = {
+    'id'        : ('DatacenterID', int, None),
+    'location'  : ('Location', str, None),
+    'name'      : ('Location', str, None),
+  }
+
+  list_method = _api.avail_datacenters
