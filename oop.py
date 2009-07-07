@@ -196,3 +196,20 @@ class Datacenter(LinodeObject):
   }
 
   list_method = _api.avail_datacenters
+
+class LinodeJob(LinodeObject):
+  fields = {
+    'id'            : ('LinodeJobID', int, None),
+    'linode'        : ('LinodeID', int, None),
+    'label'         : ('Label', str, None),
+    'name'          : ('Label', str, None),
+    'entered'       : ('ENTERED_DT', None, None),
+    'started'       : ('HOST_START_DT', None, None),
+    'finished'      : ('HOST_FINISH_DT', None, None),
+    'message'       : ('HOST_MESSAGE', str, None),
+    'duration'      : ('DURATION', None, None),
+    'success'       : ('HOST_SUCCESS', bool, unbool),
+    'pending_only'  : ('PendingOnly', bool, unbool),
+  }
+
+  list_method = _api.linode_job_list
