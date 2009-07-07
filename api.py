@@ -202,7 +202,7 @@ class Api:
   def linode_shutdown(self, request):
     pass
 
-  @__api_request(required=['LinodeID'], optional=['LinodeConfigID'])
+  @__api_request(required=['LinodeID'], optional=['ConfigID'])
   def linode_boot(self, request):
     pass
 
@@ -210,7 +210,7 @@ class Api:
   def linode_delete(self, request):
     pass
 
-  @__api_request(required=['LinodeID'], optional=['LinodeConfigID'])
+  @__api_request(required=['LinodeID'], optional=['ConfigID'])
   def linode_reboot(self, request):
     pass
 
@@ -218,7 +218,7 @@ class Api:
   def linode_config_list(self, request):
     pass
 
-  @__api_request(required=['LinodeID', 'LinodeConfigID'], optional=[
+  @__api_request(required=['LinodeID', 'ConfigID'], optional=[
                                                             'KernelID',
                                                             'Label',
                                                             'Comments',
@@ -250,7 +250,7 @@ class Api:
   def linode_config_create(self, request):
     pass
 
-  @__api_request(required=['LinodeID', 'LinodeConfigID'])
+  @__api_request(required=['LinodeID', 'ConfigID'])
   def linode_config_delete(self, request):
     pass
   
