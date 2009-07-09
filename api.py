@@ -184,7 +184,7 @@ class Api:
         else: #parameters passed, expect a dict
           params = mparams
 
-        params = dict([(key.lower(),value) for key,value in params.iteritems() if value])
+        params = dict([(key.lower(),value) for key,value in params.iteritems() if value is not None])
 
         for k in required:
           k = k.lower()
