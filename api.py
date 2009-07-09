@@ -227,8 +227,21 @@ class Api:
         else:
           return self.__send_request(request)
 
+      if (required or optional) and func.__doc__:
+        # Add parameters to the docstring as required.
+        paramdocs = ''
+        if len(func.__doc__.split('\n')) == 1:
+          paramdocs = '\n'
+        paramdocs = paramdocs + '\n    Keyword arguments:\n'
+        for p in required:
+          paramdocs = paramdocs + ' '*8 + '%-24s (required)\n' % p
+        for p in optional:
+          paramdocs = paramdocs + ' '*8 + '%-24s (optional)\n' % p
+        wrapper.__doc__ = func.__doc__ + paramdocs
+      else:
+        wrapper.__doc__ = func.__doc__
+
       wrapper.__name__ = func.__name__
-      wrapper.__doc__ = func.__doc__
       wrapper.__dict__.update(func.__dict__)
       return wrapper
     return decorator
