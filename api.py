@@ -388,9 +388,22 @@ class Api:
     """Lists a Linode's IP addresses."""
     pass
 
-  @__api_request(required=['LinodeID'], optional=['pendingOnly'])
+  @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'])
   def linode_job_list(self, request):
-    """Returns the contents of the job queue."""
+    """Returns the contents of the job queue.
+
+    Returns:
+        [{u'HOST_FINISH_DT': 'yyyy-mm-dd hh:mm:ss.0' or '',
+          u'LINODEID': Linode ID,
+          u'JOBID': Job ID,
+          u'ENTERED_DT': 'yyyy-mm-dd hh:mm:ss.0'
+          u'HOST_MESSAGE': 'response from host'
+          u'HOST_START_DT': 'yyyy-mm-dd hh:mm:ss.0' or '',
+          u'DURATION': Duration spent processing or '',
+          u'HOST_SUCCESS': 1 or '',
+          u'ACTION': 'API action' (e.g. u'linode.create'),
+          u'LABEL': 'Description of job'}, ...]
+    """
     pass
 
   @__api_request(optional=['isXen'])
@@ -429,8 +442,7 @@ class Api:
 
   @__api_request()
   def avail_linodeplans(self, request):
-    """
-    Returns a structure of Linode PlanIDs containing PlanIDs, and their
+    """Returns a structure of Linode PlanIDs containing PlanIDs, and their
     availability in each datacenter.
 
     Returns:
