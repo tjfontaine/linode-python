@@ -97,6 +97,27 @@ class LowerCaseDict(dict):
     return dict.pop(self, key.lower(), def_val)
 
 class Api:
+  """Linode API (version 2) client class.
+
+  Instantiate with: Api(key='your_api_key'[, debug][, batching])
+
+        key - Your API key, from "My Profile" in the LPM
+        debug - Set to True to enable debugging
+            (can also be set with "debugging" method)
+        batching - Enable batching support
+
+  Interfaces with the Linode API (version 2) and receives a response
+  via JSON, which is then parsed and returned as a dictionary (or list
+  of dictionaries).
+
+  In the event of problems, raises ApiError:
+        api.ApiError: [{u'ERRORCODE': 99,
+                        u'ERRORMESSAGE': u'Error Message'}]
+
+  Full documentation on the API can be found from Linode at:
+        http://beta.linode.com/api/autodoc.cfm
+  """
+
   def __init__(self, key, debug=False, batching=False):
     self.__key = key
     self.__urlopen = urllib2.urlopen
@@ -206,14 +227,28 @@ class Api:
         else:
           return self.__send_request(request)
 
+      if (required or optional) and func.__doc__:
+        # Add parameters to the docstring as required.
+        paramdocs = ''
+        if len(func.__doc__.split('\n')) == 1:
+          paramdocs = '\n'
+        paramdocs = paramdocs + '\n    Keyword arguments:\n'
+        for p in required:
+          paramdocs = paramdocs + ' '*8 + '%-24s (required)\n' % p
+        for p in optional:
+          paramdocs = paramdocs + ' '*8 + '%-24s (optional)\n' % p
+        wrapper.__doc__ = func.__doc__ + paramdocs
+      else:
+        wrapper.__doc__ = func.__doc__
+
       wrapper.__name__ = func.__name__
-      wrapper.__doc__ = func.__doc__
       wrapper.__dict__.update(func.__dict__)
       return wrapper
     return decorator
 
   @__api_request(optional=['LinodeID'])
   def linode_list(self, request):
+    """List information about your Linodes."""
     pass
 
   @__api_request(required=['LinodeID'], optional=['Label',
@@ -233,30 +268,45 @@ class Api:
                                                   'watchdog',
                                                  ])
   def linode_update(self, request):
+    """Update information about, or settings for, a Linode."""
     pass
 
   @__api_request(required=['DatacenterID', 'PlanID', 'PaymentTerm'])
   def linode_create(self, request):
+    """
+    Create a new Linode.
+
+    WARNING: This will create a billing event.
+    """
     pass
 
   @__api_request(required=['LinodeID'])
   def linode_shutdown(self, request):
+    """Shut down a Linode."""
     pass
 
   @__api_request(required=['LinodeID'], optional=['ConfigID'])
   def linode_boot(self, request):
+    """Boot a Linode."""
     pass
 
   @__api_request(required=['LinodeID'])
   def linode_delete(self, request):
+    """
+    Completely, immediately, and totally deletes a Linode.
+
+    WARNING: This will permenantly delete a Linode, running or no.
+    """
     pass
 
   @__api_request(required=['LinodeID'], optional=['ConfigID'])
   def linode_reboot(self, request):
+    """Issues a reboot job for a Linode."""
     pass
 
   @__api_request(required=['LinodeID'])
   def linode_config_list(self, request):
+    """Lists all configuration profiles for a given Linode."""
     pass
 
   @__api_request(required=['LinodeID', 'ConfigID'], optional=[
@@ -274,6 +324,7 @@ class Api:
                                                             'helper_depmod',
                                                           ])
   def linode_config_update(self, request):
+    """Updates a configuration profile."""
     pass
 
   @__api_request(required=['LinodeID', 'KernelID', 'Label', 'Disklist'],
@@ -289,56 +340,114 @@ class Api:
                                                             'helper_depmod',
                                                           ])
   def linode_config_create(self, request):
+    """Creates a configuration profile."""
     pass
 
   @__api_request(required=['LinodeID', 'ConfigID'])
   def linode_config_delete(self, request):
+    """Deletes a configuration profile."""
     pass
   
   @__api_request(required=['LinodeID'])
   def linode_disk_list(self, request):
+    """Lists all disk images associated with a Linode."""
     pass
 
   @__api_request(required=['LinodeID', 'DiskID'], optional=['Label', 'isReadOnly'])
   def linode_disk_update(self, request):
+    """Updates the information about a disk image."""
     pass
 
   @__api_request(required=['LinodeID', 'Type', 'Size', 'Label'], optional=['isReadOnly'])
   def linode_disk_create(self, request):
+    """Creates a disk image."""
     pass
 
   @__api_request(required=['LinodeID', 'DiskID'])
   def linode_disk_duplicate(self, request):
+    """Performs a bit-for-bit copy of a disk image."""
     pass
 
   @__api_request(required=['LinodeID', 'DiskID'])
   def linode_disk_delete(self, request):
+    """Deletes a disk image."""
     pass
 
   @__api_request(required=['LinodeID', 'DiskID', 'Size'])
   def linode_disk_resize(self, request):
+    """Resizes a disk image."""
     pass
 
   @__api_request(required=['LinodeID', 'DistributionID', 'rootPass', 'Label', 'Size'])
   def linode_disk_createfromdistribution(self, request):
+    """Creates a disk image from a distribution template."""
     pass
 
   @__api_request(required=['LinodeID'], optional=['IPAddressID'])
   def linode_ip_list(self, request):
+    """Lists a Linode's IP addresses."""
     pass
 
-  @__api_request(required=['LinodeID'], optional=['pendingOnly'])
+  @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'])
   def linode_job_list(self, request):
+    """Returns the contents of the job queue.
+
+    Returns:
+        [{u'HOST_FINISH_DT': 'yyyy-mm-dd hh:mm:ss.0' or '',
+          u'LINODEID': Linode ID,
+          u'JOBID': Job ID,
+          u'ENTERED_DT': 'yyyy-mm-dd hh:mm:ss.0'
+          u'HOST_MESSAGE': 'response from host'
+          u'HOST_START_DT': 'yyyy-mm-dd hh:mm:ss.0' or '',
+          u'DURATION': Duration spent processing or '',
+          u'HOST_SUCCESS': 1 or '',
+          u'ACTION': 'API action' (e.g. u'linode.create'),
+          u'LABEL': 'Description of job'}, ...]
+    """
     pass
 
   @__api_request(optional=['isXen'])
   def avail_kernels(self, request):
+    """List available kernels.
+
+    Returns:
+        [{u'KERNELID': Kernel ID,
+          u'ISXEN': 0 or 1,
+          u'LABEL': 'kernel version string'}, ...]
+    """
     pass
 
   @__api_request()
   def avail_distributions(self, request):
+    """Returns a list of available Linux Distributions.
+
+    Returns:
+        [{u'IS64BIT': 0 or 1,
+          u'CREATE_DT': 'YYYY-MM-DD hh:mm:ss.0',
+          u'DISTRIBUTIONID': Distribution ID,
+          u'MINIMAGESIZE': MB required to deploy image,
+          u'LABEL': 'Description of image'}, ...]
+    """
     pass
 
   @__api_request()
   def avail_datacenters(self, request):
+    """Returns a list of Linode data center facilities.
+
+    Returns:
+        [{u'DATACENTERID': Datacenter ID,
+          u'LOCATION': 'City, ST, USA'}, ...]
+    """
+    pass
+
+  @__api_request()
+  def avail_linodeplans(self, request):
+    """Returns a structure of Linode PlanIDs containing PlanIDs, and their
+    availability in each datacenter.
+
+    Returns:
+        {'Plan ID':
+            {u'AVAIL': {
+                u'Datacenter ID': Quantity, ...}, ...}, ...}
+    """
     pass
