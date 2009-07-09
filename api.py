@@ -97,6 +97,27 @@ class LowerCaseDict(dict):
     return dict.pop(self, key.lower(), def_val)
 
 class Api:
+  """Linode API (version 2) client class.
+
+  Instantiate with: Api(key='your_api_key'[, debug][, batching])
+
+        key - Your API key, from "My Profile" in the LPM
+        debug - Set to True to enable debugging
+            (can also be set with "debugging" method)
+        batching - Enable batching support
+
+  Interfaces with the Linode API (version 2) and receives a response
+  via JSON, which is then parsed and returned as a dictionary (or list
+  of dictionaries).
+
+  In the event of problems, raises ApiError:
+        api.ApiError: [{u'ERRORCODE': 99,
+                        u'ERRORMESSAGE': u'Error Message'}]
+
+  Full documentation on the API can be found from Linode at:
+        http://beta.linode.com/api/autodoc.cfm
+  """
+
   def __init__(self, key, debug=False, batching=False):
     self.__key = key
     self.__urlopen = urllib2.urlopen
