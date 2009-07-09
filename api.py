@@ -156,6 +156,11 @@ class Api:
     if type(json) is dict:
       if len(json['ERRORARRAY']) > 0:
         raise ApiError(json['ERRORARRAY'])
+      elif json['DATA'].has_key('JobID'):
+        if json['DATA']['JobID'] == 0:
+          raise ApiError([{u'ERRORCODE': 0, u'ERRORMESSAGE': u'Job submission failed (JobID=0)'}])
+        else:
+          return json['DATA']
       else:
         return json['DATA']
     else:
