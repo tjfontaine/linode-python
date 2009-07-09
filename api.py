@@ -42,7 +42,30 @@ class MissingRequiredArgument(Exception):
     return repr(self.value)
 
 class ApiError(Exception):
-  """Raised when a Linode API call returns an error."""
+  """Raised when a Linode API call returns an error.
+
+  Returns:
+    [{u'ERRORCODE': Error code number,
+      u'ERRORMESSAGE': 'Description of error'}]
+
+  ErrorCodes that can be returned by any method, per Linode API specification:
+    0: ok
+    1: Bad request
+    2: No action was requested
+    3: The requested class does not exist
+    4: Authentication failed
+    5: Object not found
+    6: A required property is missing for this action
+    7: Property is invalid
+    8: A data validation error has occurred
+    9: Method Not Implemented
+    10: Too many batched requests
+    11: RequestArray isn't valid JSON or WDDX
+    13: Permission denied
+    30: Charging the credit card failed
+    31: Credit card is expired
+    40: Limit of Linodes added per hour reached
+  """
   
   def __init__(self, value):
     self.value = value
