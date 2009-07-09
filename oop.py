@@ -84,6 +84,9 @@ class LinodeObject(object):
 class Linode(LinodeObject):
   fields = {
     'id'                : ('LinodeID', int, None),
+    'datacenter'        : ('DatacenterID', int, None),
+    'plan'              : ('PlanID', int, None),
+    'term'              : ('PaymentTerm', int, None),
     'name'              : ('Label', str, None),
     'label'             : ('Label', str, None),
     'group'             : ('lpm_displayGroup', None, None),
