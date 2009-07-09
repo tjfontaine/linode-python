@@ -422,7 +422,20 @@ class Api:
     """Returns a list of Linode data center facilities.
 
     Returns:
-           [{u'DATACENTERID': Datacenter ID,
-             u'LOCATION': 'City, ST, USA'}, ...]
+        [{u'DATACENTERID': Datacenter ID,
+          u'LOCATION': 'City, ST, USA'}, ...]
+    """
+    pass
+
+  @__api_request()
+  def avail_linodeplans(self, request):
+    """
+    Returns a structure of Linode PlanIDs containing PlanIDs, and their
+    availability in each datacenter.
+
+    Returns:
+        {'Plan ID':
+            {u'AVAIL': {
+                u'Datacenter ID': Quantity, ...}, ...}, ...}
     """
     pass
