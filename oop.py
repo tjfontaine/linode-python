@@ -103,6 +103,9 @@ class Linode(LinodeObject):
     'backup_window'     : ('backupWindow', None, None),
     'backup_weekly_day' : ('backupWeeklyDay', None, None),
     'watchdog'          : ('watchdog', bool, unbool),
+    'total_ram'         : ('TotalRam', int, None),
+    'total_diskspace'   : ('TotalHD', int, None),
+    'total_xfer'        : ('TotalXfer', int, None),
   }
 
   update_method = _api.linode_update
