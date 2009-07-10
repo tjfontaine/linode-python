@@ -69,23 +69,23 @@ class LinodeObject(object):
   def list(self, **kw):
     kwargs = self.__resolve_kwargs(kw)
 
-    if not _id_cache.has_key(self.__class__):
-      _id_cache[self.__class__] = {}
+    if not _id_cache.has_key(self):
+      _id_cache[self] = {}
 
     for l in self.list_method(**kwargs):
       l = LowerCaseDict(l)
-      _id_cache[self.__class__][l[self.primary_key]] = l
+      _id_cache[self][l[self.primary_key]] = l
       yield self(l)
 
   @classmethod
   def get(self, **kw):
     kwargs = self.__resolve_kwargs(kw)
 
-    if not _id_cache.has_key(self.__class__):
-      _id_cache[self.__class__] = {}
+    if not _id_cache.has_key(self):
+      _id_cache[self] = {}
 
     result = None
-    for k,v in _id_cache[self.__class__].items():
+    for k,v in _id_cache[self].items():
       found = True
       for i, j in kwargs.items():
         if not v.has_key(i) or v[i] != j:
@@ -99,7 +99,7 @@ class LinodeObject(object):
 
     if not result:
       result = LowerCaseDict(self.list_method(**kwargs)[0])
-      _id_cache[self.__class__][result[self.primary_key]] = result
+      _id_cache[self][result[self.primary_key]] = result
 
     return self(result)
 
