@@ -36,7 +36,7 @@ class ChoiceField(Field):
   to_py = lambda self, value: value
 
   def __init__(self, field, choices=[]):
-    self.field = field
+    Field.__init__(self, field)
     self.choices = choices
 
   def to_linode(self, value):
@@ -46,8 +46,16 @@ class ChoiceField(Field):
       raise AttributeError
 
 class ListField(Field):
-  to_py = lambda self, value: value.split(',')
-  to_linode = lambda self, value: ','.join(value)
+  def __init__(self, field, type=Field(''), delim=','):
+    Field.__init__(self, field)
+    self.__type=type
+    self.__delim=delim
+
+  def to_linode(self, value):
+    return self.__delim.join([str(self.__type.to_linode(v)) for v in value])
+
+  def to_py(self, value):
+    return [self.__type.to_py(v) for v in value.split(self.__delim)]
 
 class DateTimeField(Field):
   to_py = lambda self, value: datetime.strptime(value, '%Y-%m-%d %H:%M:%S')

@@ -154,14 +154,14 @@ class LinodeDisk(LinodeObject):
   list_method   = _api.linode_disk_list
 
   def duplicate(self):
-    ret = _api.linode_disk_duplicate(linodeid=self.linode, diskid=self.id)
+    ret = _api.linode_disk_duplicate(linodeid=self.linode.id, diskid=self.id)
     return LinodeDisk(LinodeDisk.get(linode=self.linode, id=ret['DiskID']))
 
   def resize(self, size):
-    _api.linode_disk_resize(linodeid=self.linode, diskid=self.id, size=size)
+    _api.linode_disk_resize(linodeid=self.linode.id, diskid=self.id, size=size)
 
   def delete(self):
-    _api.linode_disk_delete(linodeid=self.linode, diskid=self.id)
+    _api.linode_disk_delete(linodeid=self.linode.id, diskid=self.id)
 
 class Kernel(LinodeObject):
   fields = {
@@ -179,7 +179,7 @@ class LinodeConfig(LinodeObject):
     'id'                  : IntField('ConfigID'),
     'linode'              : ForeignField(Linode),
     'kernel'              : ForeignField(Kernel),
-    'disklist'            : ListField('DISKLIST'),
+    'disklist'            : ListField('DiskList', type=ForeignField(LinodeDisk)),
     'name'                : CharField('Label'),
     'label'               : CharField('Label'),
     'comments'            : CharField('Comments'),
