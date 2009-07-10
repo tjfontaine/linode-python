@@ -6,6 +6,8 @@ from fields import *
 
 _api = Api(environ['LINODE_API_KEY'], debug=True)
 
+_id_cache = {}
+
 class LinodeObject(object):
   fields = None
   update_method = None
@@ -56,21 +58,53 @@ class LinodeObject(object):
     self.update_method(**self.__entry)
 
   @classmethod
-  def list(self, **kw):
+  def __resolve_kwargs(self, kw):
     kwargs = {}
     for k, v in kw.items():
       f = self.fields[k.lower()]
       kwargs[f.field] = f.to_linode(v)
+    return kwargs
+
+  @classmethod
+  def list(self, **kw):
+    kwargs = self.__resolve_kwargs(kw)
+
+    if not _id_cache.has_key(self):
+      _id_cache[self] = {}
+
     for l in self.list_method(**kwargs):
+      l = LowerCaseDict(l)
+      _id_cache[self][l[self.primary_key]] = l
       yield self(l)
 
   @classmethod
   def get(self, **kw):
-    kwargs = {}
-    for k, v in kw.items():
-      f = self.fields[k.lower()]
-      kwargs[f.field] = f.to_linode(v)
-    return self(self.list_method(**kwargs)[0])
+    kwargs = self.__resolve_kwargs(kw)
+
+    if not _id_cache.has_key(self):
+      _id_cache[self] = {}
+
+    result = None
+    for k,v in _id_cache[self].items():
+      found = True
+      for i, j in kwargs.items():
+        if not v.has_key(i) or v[i] != j:
+          found = False
+          break
+      if not found:
+        continue
+      else:
+        result = v
+        break
+
+    if not result:
+      result = LowerCaseDict(self.list_method(**kwargs)[0])
+      _id_cache[self][result[self.primary_key]] = result
+
+    return self(result)
+
+  def cache_remove(self):
+    del _id_cache[self.__class__][self.__entry[self.primary_key]]
 
 class Datacenter(LinodeObject):
   fields = {
@@ -136,6 +170,7 @@ class Linode(LinodeObject):
     _api.linode_reboot(linodeid=self.id)
 
   def delete(self):
+    self.cache_remove()
     _api.linode_delete(linodeid=self.id)
 
 class LinodeDisk(LinodeObject):
@@ -154,14 +189,15 @@ class LinodeDisk(LinodeObject):
   list_method   = _api.linode_disk_list
 
   def duplicate(self):
-    ret = _api.linode_disk_duplicate(linodeid=self.linode, diskid=self.id)
+    ret = _api.linode_disk_duplicate(linodeid=self.linode.id, diskid=self.id)
     return LinodeDisk(LinodeDisk.get(linode=self.linode, id=ret['DiskID']))
 
   def resize(self, size):
-    _api.linode_disk_resize(linodeid=self.linode, diskid=self.id, size=size)
+    _api.linode_disk_resize(linodeid=self.linode.id, diskid=self.id, size=size)
 
   def delete(self):
-    _api.linode_disk_delete(linodeid=self.linode, diskid=self.id)
+    self.cache_remove()
+    _api.linode_disk_delete(linodeid=self.linode.id, diskid=self.id)
 
 class Kernel(LinodeObject):
   fields = {
@@ -179,7 +215,7 @@ class LinodeConfig(LinodeObject):
     'id'                  : IntField('ConfigID'),
     'linode'              : ForeignField(Linode),
     'kernel'              : ForeignField(Kernel),
-    'disklist'            : ListField('DISKLIST'),
+    'disklist'            : ListField('DiskList', type=ForeignField(LinodeDisk)),
     'name'                : CharField('Label'),
     'label'               : CharField('Label'),
     'comments'            : CharField('Comments'),
@@ -196,6 +232,10 @@ class LinodeConfig(LinodeObject):
   create_method = _api.linode_config_create
   primary_key   = 'ConfigID'
   list_method   = _api.linode_config_list
+
+  def delete(self):
+    self.cache_remove()
+    _api.linode_config_delete(linodeid=self.linode.id, configid=self.id)
 
 class Distribution(LinodeObject):
   fields = {
@@ -237,3 +277,9 @@ class LinodeIP(LinodeObject):
   }
 
   list_method = _api.linode_ip_list
+
+def fill_cache():
+  a = [i for i in Linode.list()]
+  a = [i for i in Datacenter.list()]
+  #a = [i for i in LinodePlan.list()]
+  a = [i for i in Kernel.list()]
