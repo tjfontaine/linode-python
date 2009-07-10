@@ -62,4 +62,7 @@ class ForeignField(Field):
     return self.__model.get(id=value)
 
   def to_linode(self, value):
-    return value.id
+    if isinstance(value, int):
+      return value
+    else:
+      return value.id
