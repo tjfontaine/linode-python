@@ -2,56 +2,9 @@ from os import environ
 from datetime import datetime
 
 from api import Api, LowerCaseDict
+from fields import *
 
 _api = Api(environ['LINODE_API_KEY'], debug=True)
-
-class Field(object):
-  to_py = lambda self, value: value
-  to_linode = to_py
-
-  def __init__(self, field):
-    self.field = field
-
-class IntField(Field):
-  def to_py(self, value):
-    if value is not None:
-      return int(value)
-
-  to_linode = to_py
-
-class CharField(Field):
-  to_py = lambda self, value: str(value)
-  to_linode = to_py
-
-class BoolField(Field):
-  def to_py(self, value):
-    if value in (1, '1'): return True
-    else: return False
-
-  def to_linode(self, value):
-    if value: return 1
-    else: return 0
-
-class ChoiceField(Field):
-  to_py = lambda self, value: value
-
-  def __init__(self, field, choices=[]):
-    self.field = field
-    self.choices = choices
-
-  def to_linode(self, value):
-    if value in self.choices:
-      return value
-    else:
-      raise AttributeError
-
-class ListField(Field):
-  to_py = lambda self, value: value.split(',')
-  to_linode = lambda self, value: ','.join(value)
-
-class DateTimeField(Field):
-  to_py = lambda self, value: datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-  to_linode = lambda self, value: value.strftime('%Y-%m-%d %H:%M:%S')
 
 class LinodeObject(object):
   fields = None
@@ -119,11 +72,33 @@ class LinodeObject(object):
       kwargs[f.field] = v
     return self(self.list_method(**kwargs)[0])
 
+class Datacenter(LinodeObject):
+  fields = {
+    'id'        : IntField('DatacenterID'),
+    'location'  : CharField('Location'),
+    'name'      : CharField('Location'),
+  }
+
+  list_method = _api.avail_datacenters
+  primary_key =  'DatacenterID'
+
+class LinodePlan(LinodeObject):
+  fields = {
+    'id'      : IntField('PlanID'),
+    'label'   : CharField('Label'),
+    'price'   : FloatField('Price'),
+    'ram'     : IntField('Ram'),
+    'xfer'    : IntField('Xfer'),
+  }
+
+  list_method = _api.avail_linodeplans
+  primary_key = 'PlanID'
+
 class Linode(LinodeObject):
   fields = {
     'id'                : IntField('LinodeID'),
-    'datacenter'        : IntField('DatacenterID'),
-    'plan'              : IntField('PlanID'),
+    'datacenter'        : ForeignField(Datacenter),
+    'plan'              : ForeignField(LinodePlan),
     'term'              : ChoiceField('PaymentTerm', choices=[1, 12, 24]),
     'name'              : CharField('Label'),
     'label'             : CharField('Label'),
@@ -188,11 +163,22 @@ class LinodeDisk(LinodeObject):
   def delete(self):
     _api.linode_disk_delete(linodeid=self.linode, diskid=self.id)
 
+class Kernel(LinodeObject):
+  fields = {
+    'id'    : IntField('KernelID'),
+    'label' : CharField('Label'),
+    'name'  : CharField('Label'),
+    'is_xen': BoolField('IsXen'),
+  }
+
+  list_method = _api.avail_kernels
+  primary_key = 'KernelID'
+
 class LinodeConfig(LinodeObject):
   fields = {
     'id'                  : IntField('ConfigID'),
-    'linode'              : IntField('LinodeID'),
-    'kernel'              : IntField('KernelID'),
+    'linode'              : ForeignField(Linode),
+    'kernel'              : ForeignField(Kernel),
     'disklist'            : ListField('DISKLIST'),
     'name'                : CharField('Label'),
     'label'               : CharField('Label'),
@@ -211,16 +197,6 @@ class LinodeConfig(LinodeObject):
   primary_key   = 'ConfigID'
   list_method   = _api.linode_config_list
 
-class Kernel(LinodeObject):
-  fields = {
-    'id'    : IntField('KernelID'),
-    'label' : CharField('Label'),
-    'name'  : CharField('Label'),
-    'is_xen': BoolField('IsXen'),
-  }
-
-  list_method = _api.avail_kernels
-
 class Distribution(LinodeObject):
   fields = {
     'id'        : IntField('DistributionID'),
@@ -232,20 +208,12 @@ class Distribution(LinodeObject):
   }
 
   list_method = _api.avail_distributions
-
-class Datacenter(LinodeObject):
-  fields = {
-    'id'        : IntField('DatacenterID'),
-    'location'  : CharField('Location'),
-    'name'      : CharField('Location'),
-  }
-
-  list_method = _api.avail_datacenters
+  primary_key = 'DistributionID'
 
 class LinodeJob(LinodeObject):
   fields = {
     'id'            : IntField('LinodeJobID'),
-    'linode'        : IntField('LinodeID'),
+    'linode'        : ForeignField(Linode),
     'label'         : CharField('Label'),
     'name'          : CharField('Label'),
     'entered'       : DateTimeField('ENTERED_DT'),
@@ -262,7 +230,7 @@ class LinodeJob(LinodeObject):
 class LinodeIP(LinodeObject):
   fields = {
     'id'        : IntField('IPAddressID'),
-    'linode'    : IntField('LinodeID'),
+    'linode'    : ForeignField(Linode),
     'address'   : CharField('IPADDRESS'),
     'is_public' : BoolField('ISPUBLIC'),
     'rdns'      : CharField('RDNS_NAME'),
