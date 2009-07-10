@@ -60,7 +60,7 @@ class LinodeObject(object):
     kwargs = {}
     for k, v in kw.items():
       f = self.fields[k.lower()]
-      kwargs[f.field] = v
+      kwargs[f.field] = f.to_linode(v)
     for l in self.list_method(**kwargs):
       yield self(l)
 
@@ -69,7 +69,7 @@ class LinodeObject(object):
     kwargs = {}
     for k, v in kw.items():
       f = self.fields[k.lower()]
-      kwargs[f.field] = v
+      kwargs[f.field] = f.to_linode(v)
     return self(self.list_method(**kwargs)[0])
 
 class Datacenter(LinodeObject):
@@ -141,8 +141,8 @@ class Linode(LinodeObject):
 class LinodeDisk(LinodeObject):
   fields = {
     'id'      : IntField('DiskID'),
-    'linode'  : IntField('LinodeID'),
-    'type'    : CharField('Type'),
+    'linode'  : ForeignField(Linode),
+    'type'    : ChoiceField('Type', choices=['ext3', 'swap', 'raw']),
     'size'    : IntField('Size'),
     'name'    : CharField('Label'),
     'label'   : CharField('Label'),
