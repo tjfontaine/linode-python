@@ -330,8 +330,7 @@ class Api:
 
   @__api_request(required=['DatacenterID', 'PlanID', 'PaymentTerm'])
   def linode_create(self, request):
-    """
-    Create a new Linode.
+    """Create a new Linode.
 
     WARNING: This will create a billing event.
 
@@ -341,18 +340,23 @@ class Api:
 
   @__api_request(required=['LinodeID'])
   def linode_shutdown(self, request):
-    """Shut down a Linode."""
+    """Submit a shutdown job for a Linode.
+
+    Returns {u'JobID': JobID} on successful job submission.
+    """
     pass
 
   @__api_request(required=['LinodeID'], optional=['ConfigID'])
   def linode_boot(self, request):
-    """Boot a Linode."""
+    """Submit a boot job for a Linode.
+
+    Returns {u'JobID': JobID} on successful job submission.
+    """
     pass
 
   @__api_request(required=['LinodeID'])
   def linode_delete(self, request):
-    """
-    Completely, immediately, and totally deletes a Linode.
+    """Completely, immediately, and totally deletes a Linode.
 
     WARNING: This will permenantly delete a Linode, running or no.
 
@@ -362,12 +366,33 @@ class Api:
 
   @__api_request(required=['LinodeID'], optional=['ConfigID'])
   def linode_reboot(self, request):
-    """Issues a reboot job for a Linode."""
+    """Submit a reboot job for a Linode.
+    
+    Returns {u'JobID': JobID} on successful job submission.
+    """
     pass
 
   @__api_request(required=['LinodeID'])
   def linode_config_list(self, request):
-    """Lists all configuration profiles for a given Linode."""
+    """Lists all configuration profiles for a given Linode.
+
+    Returns:
+        [{u'RAMLimit': Max memory (MB), 0 is unlimited,
+          u'RootDeviceCustom': '',
+          u'LinodeID': Linode ID,
+          u'helper_libtls': 0 or 1,   # maybe
+          u'DiskList': ',,,,,,,,' disk array,
+          u'helper_disableUpdateDB': 0 or 1,
+          u'Label': 'Profile name',
+          u'RootDeviceNum': root partition (1=first, 0=RootDeviceCustom),
+          u'RootDeviceRO': 0 or 1,    # maybe
+          u'Comments': 'comments field',
+          u'RunLevel': in ['default', 'single', 'binbash'],
+          u'KernelID': Kernel ID,
+          u'ConfigID': Config ID,
+          u'helper_xen': 0 or 1,
+          u'helper_depmod': 0 or 1}, ...]
+    """
     pass
 
   @__api_request(required=['LinodeID', 'ConfigID'], optional=[
@@ -385,7 +410,10 @@ class Api:
                                                             'helper_depmod',
                                                           ])
   def linode_config_update(self, request):
-    """Updates a configuration profile."""
+    """Updates a configuration profile.
+
+    Returns {u'ConfigID': Config ID} on successful update.
+    """
     pass
 
   @__api_request(required=['LinodeID', 'KernelID', 'Label', 'Disklist'],
@@ -401,52 +429,98 @@ class Api:
                                                             'helper_depmod',
                                                           ])
   def linode_config_create(self, request):
-    """Creates a configuration profile."""
+    """Creates a configuration profile.
+
+    Returns {u'ConfigID': Config ID} on successful creation.
+    """
     pass
 
   @__api_request(required=['LinodeID', 'ConfigID'])
   def linode_config_delete(self, request):
-    """Deletes a configuration profile."""
+    """Deletes a configuration profile.  This does not delete the Linode
+    itself, nor its disk images.
+
+    Returns {u'ConfigID': Config ID} on successful deletion.
+    """
     pass
   
   @__api_request(required=['LinodeID'])
   def linode_disk_list(self, request):
-    """Lists all disk images associated with a Linode."""
+    """Lists all disk images associated with a Linode.
+
+    Returns:
+        [{u'STATUS': Status flag,
+          u'CREATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
+          u'UPDATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
+          u'ISREADONLY': 0 or 1,
+          u'LABEL': 'Disk label',
+          u'TYPE': in ['ext3', 'swap', 'raw'],
+          u'DISKID': Disk ID,
+          u'SIZE': Size of disk (MB)}, ...]
+    """
     pass
 
   @__api_request(required=['LinodeID', 'DiskID'], optional=['Label', 'isReadOnly'])
   def linode_disk_update(self, request):
-    """Updates the information about a disk image."""
+    """Updates the information about a disk image.
+
+    Returns {u'DiskID': Disk ID} on successful update.
+    """
     pass
 
   @__api_request(required=['LinodeID', 'Type', 'Size', 'Label'], optional=['isReadOnly'])
   def linode_disk_create(self, request):
-    """Creates a disk image."""
+    """Submits a job to create a new disk image.
+
+    Returns {u'DiskID': Disk ID, u'JobID': Job ID} on job submission.
+    """
     pass
 
   @__api_request(required=['LinodeID', 'DiskID'])
   def linode_disk_duplicate(self, request):
-    """Performs a bit-for-bit copy of a disk image."""
+    """Submits a job to preform a bit-for-bit copy of a disk image.
+
+    Returns {u'DiskID': New Disk ID, u'JobID': Job ID} on job submission.
+    """
     pass
 
   @__api_request(required=['LinodeID', 'DiskID'])
   def linode_disk_delete(self, request):
-    """Deletes a disk image."""
+    """Submits a job to delete a disk image.
+
+    WARNING: All data on the disk image will be lost forever.
+
+    Returns {u'DiskID': Deleted Disk ID, u'JobID': Job ID} on job submission.
+    """
     pass
 
   @__api_request(required=['LinodeID', 'DiskID', 'Size'])
   def linode_disk_resize(self, request):
-    """Resizes a disk image."""
+    """Submits a job to resize a partition.
+
+    Returns {u'DiskID': Disk ID, u'JobID': Job ID} on job submission.
+    """
     pass
 
   @__api_request(required=['LinodeID', 'DistributionID', 'rootPass', 'Label', 'Size'])
   def linode_disk_createfromdistribution(self, request):
-    """Creates a disk image from a distribution template."""
+    """Submits a job to create a disk image from a Linode template.
+
+    Returns {u'DiskID': New Disk ID, u'JobID': Job ID} on job submission.
+    """
     pass
 
   @__api_request(required=['LinodeID'], optional=['IPAddressID'])
   def linode_ip_list(self, request):
-    """Lists a Linode's IP addresses."""
+    """Lists a Linode's IP addresses.
+
+    Returns:
+        [{u'RDNS_NAME': 'reverse.dns.name.here',
+          u'ISPUBLIC': 0 or 1,
+          u'IPADDRESS': '192.168.100.1',
+          u'IPADDRESSID': IP address ID,
+          u'LINODEID': Linode ID}, ...]
+    """
     pass
 
   @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'])
