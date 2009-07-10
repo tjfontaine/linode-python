@@ -151,13 +151,16 @@ class Api:
 
   @staticmethod
   def valid_commands():
+    """Returns a list of API commands supported by this class."""
     return ApiInfo.valid_commands.keys()
 
   @staticmethod
   def valid_params():
+    """Returns a list of all parameters used by methods of this class."""
     return ApiInfo.valid_params.keys()
 
   def debugging(self, value = None):
+    """Sets debugging mode.  value=True enables and value=False disables."""
     if value is not None:
       self.__debug = value
 
@@ -168,12 +171,14 @@ class Api:
       print msg
 
   def batching(self, value = None):
+    """Sets batching mode.  value=True enables and value=False disables."""
     if value is not None:
       self.__batching = value
 
     return self.__batching
 
   def batchFlush(self):
+    """Initiates a batch flush.  Raises Exception if not in batching mode."""
     if not self.__batching:
       raise Exception('Cannot flush requests when not batching')
 
@@ -271,7 +276,31 @@ class Api:
 
   @__api_request(optional=['LinodeID'])
   def linode_list(self, request):
-    """List information about your Linodes."""
+    """List information about your Linodes.
+
+    Returns:
+        [{u'STATUS': Status flag,
+          u'DATACENTERID': Datacenter ID,
+          u'ALERT_BWIN_ENABLED': 0 or 1,
+          u'ALERT_BWQUOTA_THRESHOLD': 0..100,
+          u'BACKUPWEEKLYDAY': 0..6 (day of week; 0 is Sunday),
+          u'ALERT_DISKIO_ENABLED': 0 or 1,
+          u'LINODEID': Linode ID,
+          u'ALERT_BWIN_THRESHOLD': integer (Mb/sec?),
+          u'BACKUPWINDOW': some integer,
+          u'ALERT_BWQUOTA_ENABLED': 0 or 1,
+          u'TOTALRAM': available RAM (MB),
+          u'LPM_DISPLAYGROUP': 'group label',
+          u'ALERT_DISKIO_THRESHOLD': integer (IO ops/sec?),
+          u'ALERT_CPU_THRESHOLD': 0..400 (% CPU),
+          u'TOTALXFER': available bandwidth (GB/month),
+          u'ALERT_BWOUT_THRESHOLD': integer (Mb/sec?),
+          u'WATCHDOG': 0 or 1,
+          u'BACKUPSENABLED': 0 or 1,
+          u'LABEL': 'linode label',
+          u'ALERT_CPU_ENABLED': 0 or 1,
+          u'TOTALHD': available disk (GB)}, ...]
+    """
     pass
 
   @__api_request(required=['LinodeID'], optional=['Label',
@@ -291,7 +320,12 @@ class Api:
                                                   'watchdog',
                                                  ])
   def linode_update(self, request):
-    """Update information about, or settings for, a Linode."""
+    """Update information about, or settings for, a Linode.
+
+    See linode_list.__doc__ for information on parameters.
+
+    Returns {u'LinodeID': LinodeID} on successful change.
+    """
     pass
 
   @__api_request(required=['DatacenterID', 'PlanID', 'PaymentTerm'])
@@ -300,6 +334,8 @@ class Api:
     Create a new Linode.
 
     WARNING: This will create a billing event.
+
+    Returns {u'LinodeID': LinodeID} on successful creation.
     """
     pass
 
@@ -319,6 +355,8 @@ class Api:
     Completely, immediately, and totally deletes a Linode.
 
     WARNING: This will permenantly delete a Linode, running or no.
+
+    Returns {u'LinodeID': LinodeID} on successful destruction.
     """
     pass
 
@@ -470,7 +508,13 @@ class Api:
 
     Returns:
         {'Plan ID':
-            {u'AVAIL': {
-                u'Datacenter ID': Quantity, ...}, ...}, ...}
+            {u'XFER': Allowed transfer (GB/mo),
+             u'PRICE': Price (US dollars),
+             u'RAM': Maximum memory (MB),
+             u'LABEL': 'Name of plan',
+             u'AVAIL': {
+                u'Datacenter ID': Quantity, ...}
+            }
+        , ...}
     """
     pass
