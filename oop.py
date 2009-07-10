@@ -1,20 +1,57 @@
 from os import environ
+from datetime import datetime
 
-from api import Api
+from api import Api, LowerCaseDict
 
 _api = Api(environ['LINODE_API_KEY'], debug=True)
 
-def bool(value):
-  if value in (1, '1'):
-    return True
-  else:
-    return False
+class Field(object):
+  to_py = lambda self, value: value
+  to_linode = to_py
 
-def unbool(value):
-  if value:
-    return 1
-  else:
-    return 0
+  def __init__(self, field):
+    self.field = field
+
+class IntField(Field):
+  def to_py(self, value):
+    if value is not None:
+      return int(value)
+
+  to_linode = to_py
+
+class CharField(Field):
+  to_py = lambda self, value: str(value)
+  to_linode = to_py
+
+class BoolField(Field):
+  def to_py(self, value):
+    if value in (1, '1'): return True
+    else: return False
+
+  def to_linode(self, value):
+    if value: return 1
+    else: return 0
+
+class ChoiceField(Field):
+  to_py = lambda self, value: value
+
+  def __init__(self, field, choices=[]):
+    self.field = field
+    self.choices = choices
+
+  def to_linode(self, value):
+    if value in self.choices:
+      return value
+    else:
+      raise AttributeError
+
+class ListField(Field):
+  to_py = lambda self, value: value.split(',')
+  to_linode = lambda self, value: ','.join(value)
+
+class DateTimeField(Field):
+  to_py = lambda self, value: datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+  to_linode = lambda self, value: value.strftime('%Y-%m-%d %H:%M:%S')
 
 class LinodeObject(object):
   fields = None
@@ -24,7 +61,7 @@ class LinodeObject(object):
   list_method   = None
 
   def __init__(self, entry={}):
-    self.__entry = dict([(str(k).lower(),v) for k,v in entry.items()])
+    self.__entry = LowerCaseDict(entry)
 
   def __getattr__(self, name):
     name = name.replace('_LinodeObject', '')
@@ -33,13 +70,11 @@ class LinodeObject(object):
     elif not self.fields.has_key(name):
       raise AttributeError
     else:
-      field, conversion, deconvert = self.fields[name]
+      f= self.fields[name]
       value = None
-      if self.__entry.has_key(field.lower()):
-        value = self.__entry[field.lower()]
-        if conversion:
-          value = conversion(value)
-      return value
+      if self.__entry.has_key(f.field.lower()):
+        value = self.__entry[f.field.lower()]
+      return f.to_py(value)
 
   def __setattr__(self, name, value):
     name = name.replace('_LinodeObject', '')
@@ -48,12 +83,15 @@ class LinodeObject(object):
     elif not self.fields.has_key(name):
       raise AttributeError
     else:
-      field, conversion, deconvert = self.fields[name]
-      if deconvert:
-        value = deconvert(value)
-      elif conversion:
-        value = conversion(value)
-      self.__entry[field.lower()] = value
+      f = self.fields[name]
+      self.__entry[f.field.lower()] = f.to_linode(value)
+
+  def __str__(self):
+    s = []
+    for k,v in self.fields.items():
+      if self.__entry.has_key(v.field):
+        s.append('%s: %s' % (k, str(v.to_py(self.__entry[v.field]))))
+    return '['+', '.join(s)+']'
 
   def save(self):
     if self.id:
@@ -68,8 +106,8 @@ class LinodeObject(object):
   def list(self, **kw):
     kwargs = {}
     for k, v in kw.items():
-      f, c, d = self.fields[k.lower()]
-      kwargs[f] = v
+      f = self.fields[k.lower()]
+      kwargs[f.field] = v
     for l in self.list_method(**kwargs):
       yield self(l)
 
@@ -77,35 +115,35 @@ class LinodeObject(object):
   def get(self, **kw):
     kwargs = {}
     for k, v in kw.items():
-      f, c, d = self.fields[k.lower()]
-      kwargs[f] = v
+      f = self.fields[k.lower()]
+      kwargs[f.field] = v
     return self(self.list_method(**kwargs)[0])
 
 class Linode(LinodeObject):
   fields = {
-    'id'                : ('LinodeID', int, None),
-    'datacenter'        : ('DatacenterID', int, None),
-    'plan'              : ('PlanID', int, None),
-    'term'              : ('PaymentTerm', int, None),
-    'name'              : ('Label', str, None),
-    'label'             : ('Label', str, None),
-    'group'             : ('lpm_displayGroup', None, None),
-    'cpu_enabled'       : ('Alert_cpu_enabled', bool, unbool),
-    'cpu_threshold'     : ('Alert_cpu_threshold', int, None),
-    'diskio_enabled'    : ('Alert_diskio_enabled', bool, unbool),
-    'diskio_threshold'  : ('Alert_diskio_enabled', int, None),
-    'bwin_enabled'      : ('Alert_bwin_enabled', bool, unbool),
-    'bwin_threshold'    : ('Alert_bwin_threshold', int, None),
-    'bwout_enabled'     : ('Alert_bwout_enabeld', bool, unbool),
-    'bwout_threshold'   : ('Alert_bwout_threshold', int, None),
-    'bwquota_enabled'   : ('Alert_bwquota_enabled', bool, unbool),
-    'bwquota_threshold' : ('Alert_bwquota_threshold', int, None),
-    'backup_window'     : ('backupWindow', None, None),
-    'backup_weekly_day' : ('backupWeeklyDay', None, None),
-    'watchdog'          : ('watchdog', bool, unbool),
-    'total_ram'         : ('TotalRam', int, None),
-    'total_diskspace'   : ('TotalHD', int, None),
-    'total_xfer'        : ('TotalXfer', int, None),
+    'id'                : IntField('LinodeID'),
+    'datacenter'        : IntField('DatacenterID'),
+    'plan'              : IntField('PlanID'),
+    'term'              : ChoiceField('PaymentTerm', choices=[1, 12, 24]),
+    'name'              : CharField('Label'),
+    'label'             : CharField('Label'),
+    'group'             : Field('lpm_displayGroup'),
+    'cpu_enabled'       : BoolField('Alert_cpu_enabled'),
+    'cpu_threshold'     : IntField('Alert_cpu_threshold'),
+    'diskio_enabled'    : BoolField('Alert_diskio_enabled'),
+    'diskio_threshold'  : IntField('Alert_diskio_enabled'),
+    'bwin_enabled'      : BoolField('Alert_bwin_enabled'),
+    'bwin_threshold'    : IntField('Alert_bwin_threshold'),
+    'bwout_enabled'     : BoolField('Alert_bwout_enabeld'),
+    'bwout_threshold'   : IntField('Alert_bwout_threshold'),
+    'bwquota_enabled'   : BoolField('Alert_bwquota_enabled'),
+    'bwquota_threshold' : IntField('Alert_bwquota_threshold'),
+    'backup_window'     : Field('backupWindow'),
+    'backup_weekly_day' : ChoiceField('backupWeeklyDay', choices=range(6)),
+    'watchdog'          : BoolField('watchdog'),
+    'total_ram'         : IntField('TotalRam'),
+    'total_diskspace'   : IntField('TotalHD'),
+    'total_xfer'        : IntField('TotalXfer'),
   }
 
   update_method = _api.linode_update
@@ -127,12 +165,12 @@ class Linode(LinodeObject):
 
 class LinodeDisk(LinodeObject):
   fields = {
-    'id'      : ('DiskID', int, None),
-    'linode'  : ('LinodeID', int, None),
-    'type'    : ('Type', str, None),
-    'size'    : ('Size', int, None),
-    'name'    : ('Label', str, None),
-    'label'   : ('Label', str, None),
+    'id'      : IntField('DiskID'),
+    'linode'  : IntField('LinodeID'),
+    'type'    : CharField('Type'),
+    'size'    : IntField('Size'),
+    'name'    : CharField('Label'),
+    'label'   : CharField('Label'),
   }
 
   update_method = _api.linode_disk_update
@@ -152,20 +190,20 @@ class LinodeDisk(LinodeObject):
 
 class LinodeConfig(LinodeObject):
   fields = {
-    'id'                  : ('ConfigID', int, None),
-    'linode'              : ('LinodeID', int, None),
-    'kernel'              : ('KernelID', int, None),
-    'disklist'            : ('DISKLIST', lambda x: x.split(','), lambda x: ','.join(x)),
-    'name'                : ('Label', str, None),
-    'label'               : ('Label', str, None),
-    'comments'            : ('Comments', str, None),
-    'ram_limit'           : ('RAMLimit', int, None),
-    'root_device_num'     : ('RootDeviceNum', int, None),
-    'root_device_custom'  : ('RootDeviceCustom', int, None),
-    'root_device_readonly': ('RootDeviceRO', bool, unbool),
-    'disable_updatedb'    : ('helper_disableUpdateDB', bool, unbool),
-    'helper_xen'          : ('helper_xen', bool, unbool),
-    'helper_depmod'       : ('helper_depmod', bool, unbool),
+    'id'                  : IntField('ConfigID'),
+    'linode'              : IntField('LinodeID'),
+    'kernel'              : IntField('KernelID'),
+    'disklist'            : ListField('DISKLIST'),
+    'name'                : CharField('Label'),
+    'label'               : CharField('Label'),
+    'comments'            : CharField('Comments'),
+    'ram_limit'           : IntField('RAMLimit'),
+    'root_device_num'     : IntField('RootDeviceNum'),
+    'root_device_custom'  : IntField('RootDeviceCustom'),
+    'root_device_readonly': BoolField('RootDeviceRO'),
+    'disable_updatedb'    : BoolField('helper_disableUpdateDB'),
+    'helper_xen'          : BoolField('helper_xen'),
+    'helper_depmod'       : BoolField('helper_depmod'),
   }
 
   update_method = _api.linode_config_update
@@ -175,59 +213,59 @@ class LinodeConfig(LinodeObject):
 
 class Kernel(LinodeObject):
   fields = {
-    'id'    : ('KernelID', int, None),
-    'label' : ('Label', str, None),
-    'name'  : ('Label', str, None),
-    'is_xen': ('IsXen', bool, unbool),
+    'id'    : IntField('KernelID'),
+    'label' : CharField('Label'),
+    'name'  : CharField('Label'),
+    'is_xen': BoolField('IsXen'),
   }
 
   list_method = _api.avail_kernels
 
 class Distribution(LinodeObject):
   fields = {
-    'id'        : ('DistributionID', int, None),
-    'label'     : ('Label', str, None),
-    'name'      : ('Label', str, None),
-    'min'       : ('MinImageSize', int, None),
-    'is_64bit'  : ('Is64Bit', bool, unbool),
-    'created'   : ('CREATE_DT', None, None),
+    'id'        : IntField('DistributionID'),
+    'label'     : CharField('Label'),
+    'name'      : CharField('Label'),
+    'min'       : IntField('MinImageSize'),
+    'is_64bit'  : BoolField('Is64Bit'),
+    'created'   : DateTimeField('CREATE_DT'),
   }
 
   list_method = _api.avail_distributions
 
 class Datacenter(LinodeObject):
   fields = {
-    'id'        : ('DatacenterID', int, None),
-    'location'  : ('Location', str, None),
-    'name'      : ('Location', str, None),
+    'id'        : IntField('DatacenterID'),
+    'location'  : CharField('Location'),
+    'name'      : CharField('Location'),
   }
 
   list_method = _api.avail_datacenters
 
 class LinodeJob(LinodeObject):
   fields = {
-    'id'            : ('LinodeJobID', int, None),
-    'linode'        : ('LinodeID', int, None),
-    'label'         : ('Label', str, None),
-    'name'          : ('Label', str, None),
-    'entered'       : ('ENTERED_DT', None, None),
-    'started'       : ('HOST_START_DT', None, None),
-    'finished'      : ('HOST_FINISH_DT', None, None),
-    'message'       : ('HOST_MESSAGE', str, None),
-    'duration'      : ('DURATION', None, None),
-    'success'       : ('HOST_SUCCESS', bool, unbool),
-    'pending_only'  : ('PendingOnly', bool, unbool),
+    'id'            : IntField('LinodeJobID'),
+    'linode'        : IntField('LinodeID'),
+    'label'         : CharField('Label'),
+    'name'          : CharField('Label'),
+    'entered'       : DateTimeField('ENTERED_DT'),
+    'started'       : DateTimeField('HOST_START_DT'),
+    'finished'      : DateTimeField('HOST_FINISH_DT'),
+    'message'       : CharField('HOST_MESSAGE'),
+    'duration'      : IntField('DURATION'),
+    'success'       : BoolField('HOST_SUCCESS'),
+    'pending_only'  : BoolField('PendingOnly'),
   }
 
   list_method = _api.linode_job_list
 
 class LinodeIP(LinodeObject):
   fields = {
-    'id'        : ('IPAddressID', int, None),
-    'linode'    : ('LinodeID', int, None),
-    'address'   : ('IPADDRESS', str, None),
-    'is_public' : ('ISPUBLIC', bool, unbool),
-    'rdns'      : ('RDNS_NAME', str, None),
+    'id'        : IntField('IPAddressID'),
+    'linode'    : IntField('LinodeID'),
+    'address'   : CharField('IPADDRESS'),
+    'is_public' : BoolField('ISPUBLIC'),
+    'rdns'      : CharField('RDNS_NAME'),
   }
 
   list_method = _api.linode_ip_list
