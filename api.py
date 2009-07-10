@@ -184,7 +184,7 @@ class Api:
 
     json = simplejson.dumps(self.__batch_cache)
     self.__batch_cache = []
-    request = { 'action' : 'batch', 'requestArray' : json }
+    request = { 'api_action' : 'batch', 'requestArray' : json }
     return self.__send_request(request)
 
   def __send_request(self, request):
