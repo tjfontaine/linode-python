@@ -452,6 +452,7 @@ class Api:
         [{u'STATUS': Status flag,
           u'CREATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
           u'UPDATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
+          u'LINODEID': Linode ID,
           u'ISREADONLY': 0 or 1,
           u'LABEL': 'Disk label',
           u'TYPE': in ['ext3', 'swap', 'raw'],
