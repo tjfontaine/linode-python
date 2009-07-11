@@ -147,12 +147,13 @@ class Linode(LinodeObject):
     'bwout_threshold'   : IntField('Alert_bwout_threshold'),
     'bwquota_enabled'   : BoolField('Alert_bwquota_enabled'),
     'bwquota_threshold' : IntField('Alert_bwquota_threshold'),
-    'backup_window'     : Field('backupWindow'),
+    'backup_window'     : IntField('backupWindow'),
     'backup_weekly_day' : ChoiceField('backupWeeklyDay', choices=range(6)),
     'watchdog'          : BoolField('watchdog'),
     'total_ram'         : IntField('TotalRam'),
     'total_diskspace'   : IntField('TotalHD'),
     'total_xfer'        : IntField('TotalXfer'),
+    'status'            : IntField('Status'),
   }
 
   update_method = _api.linode_update
@@ -161,17 +162,51 @@ class Linode(LinodeObject):
   list_method   = _api.linode_list
 
   def boot(self):
-    _api.linode_boot(linodeid=self.id)
+    ### TODO XXX FIXME return LinodeJob
+    return _api.linode_boot(linodeid=self.id)['JobID']
 
   def shutdown(self):
-    _api.linode_shutdown(linodeid=self.id)
+    ### TODO XXX FIXME return LinodeJob
+    return _api.linode_shutdown(linodeid=self.id)['JobID']
 
   def reboot(self):
-    _api.linode_reboot(linodeid=self.id)
+    ### TODO XXX FIXME return LinodeJob
+    return _api.linode_reboot(linodeid=self.id)['JobID']
 
   def delete(self):
-    self.cache_remove()
     _api.linode_delete(linodeid=self.id)
+    self.cache_remove()
+
+class LinodeJob(LinodeObject):
+  fields = {
+    'id'            : IntField('JobID'),
+    'linode'        : ForeignField(Linode),
+    'label'         : CharField('Label'),
+    'name'          : CharField('Label'),
+    'entered'       : DateTimeField('ENTERED_DT'),
+    'started'       : DateTimeField('HOST_START_DT'),
+    'finished'      : DateTimeField('HOST_FINISH_DT'),
+    'message'       : CharField('HOST_MESSAGE'),
+    'duration'      : IntField('DURATION'),
+    'success'       : BoolField('HOST_SUCCESS'),
+    'pending_only'  : BoolField('PendingOnly'),
+  }
+
+  list_method = _api.linode_job_list
+  primary_key = 'JobID'
+
+class Distribution(LinodeObject):
+  fields = {
+    'id'        : IntField('DistributionID'),
+    'label'     : CharField('Label'),
+    'name'      : CharField('Label'),
+    'min'       : IntField('MinImageSize'),
+    '64bit'     : BoolField('Is64Bit'),
+    'created'   : DateTimeField('CREATE_DT'),
+  }
+
+  list_method = _api.avail_distributions
+  primary_key = 'DistributionID'
 
 class LinodeDisk(LinodeObject):
   fields = {
@@ -181,6 +216,10 @@ class LinodeDisk(LinodeObject):
     'size'    : IntField('Size'),
     'name'    : CharField('Label'),
     'label'   : CharField('Label'),
+    'status'  : IntField('Status'),
+    'created' : DateTimeField('Create_DT'),
+    'updated' : DateTimeField('Update_DT'),
+    'readonly': BoolField('IsReadonly'),
   }
 
   update_method = _api.linode_disk_update
@@ -190,14 +229,29 @@ class LinodeDisk(LinodeObject):
 
   def duplicate(self):
     ret = _api.linode_disk_duplicate(linodeid=self.linode.id, diskid=self.id)
-    return LinodeDisk(LinodeDisk.get(linode=self.linode, id=ret['DiskID']))
+    disk = LinodeDisk.get(linode=self.linode, id=ret['DiskID'])
+    job = LinodeJob(linode=self.linode, id=ret['JobID'])
+    return (disk, job)
 
   def resize(self, size):
-    _api.linode_disk_resize(linodeid=self.linode.id, diskid=self.id, size=size)
+    ret = _api.linode_disk_resize(linodeid=self.linode.id, diskid=self.id, size=size)
+    return LinodeJob.get(linode=self.linode, id=ret['JobID'])
 
   def delete(self):
+    ret = _api.linode_disk_delete(linodeid=self.linode.id, diskid=self.id)
+    job = LinodeJob.get(linode=self.linode, id=ret['JobID'])
     self.cache_remove()
-    _api.linode_disk_delete(linodeid=self.linode.id, diskid=self.id)
+    return job
+
+  @classmethod
+  def create_from_distribution(self, linode, distribution, root_pass, label, size):
+    l = ForeignField(Linode).to_linode(linode)
+    d = ForeignField(Distribution).to_linode(distribution)
+    ret = _api.linode_disk_createfromdistribution(linodeid=l, distributionid=d,
+            rootpass=root_pass, label=label, size=size)
+    disk = self.get(id=ret['DiskID'], linode=linode)
+    job = LinodeJob(id=ret['JobID'], linode=linode)
+    return (disk, job)
 
 class Kernel(LinodeObject):
   fields = {
@@ -236,36 +290,6 @@ class LinodeConfig(LinodeObject):
   def delete(self):
     self.cache_remove()
     _api.linode_config_delete(linodeid=self.linode.id, configid=self.id)
-
-class Distribution(LinodeObject):
-  fields = {
-    'id'        : IntField('DistributionID'),
-    'label'     : CharField('Label'),
-    'name'      : CharField('Label'),
-    'min'       : IntField('MinImageSize'),
-    'is_64bit'  : BoolField('Is64Bit'),
-    'created'   : DateTimeField('CREATE_DT'),
-  }
-
-  list_method = _api.avail_distributions
-  primary_key = 'DistributionID'
-
-class LinodeJob(LinodeObject):
-  fields = {
-    'id'            : IntField('LinodeJobID'),
-    'linode'        : ForeignField(Linode),
-    'label'         : CharField('Label'),
-    'name'          : CharField('Label'),
-    'entered'       : DateTimeField('ENTERED_DT'),
-    'started'       : DateTimeField('HOST_START_DT'),
-    'finished'      : DateTimeField('HOST_FINISH_DT'),
-    'message'       : CharField('HOST_MESSAGE'),
-    'duration'      : IntField('DURATION'),
-    'success'       : BoolField('HOST_SUCCESS'),
-    'pending_only'  : BoolField('PendingOnly'),
-  }
-
-  list_method = _api.linode_job_list
 
 class LinodeIP(LinodeObject):
   fields = {
