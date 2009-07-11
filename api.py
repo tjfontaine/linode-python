@@ -30,7 +30,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import urllib
 import urllib2
-import simplejson
+
+try:
+  import json
+except:
+  import simplejson as json
 
 
 class MissingRequiredArgument(Exception):
@@ -182,9 +186,9 @@ class Api:
     if not self.__batching:
       raise Exception('Cannot flush requests when not batching')
 
-    json = simplejson.dumps(self.__batch_cache)
+    s = json.dumps(self.__batch_cache)
     self.__batch_cache = []
-    request = { 'api_action' : 'batch', 'requestArray' : json }
+    request = { 'api_action' : 'batch', 'requestArray' : s }
     return self.__send_request(request)
 
   def __send_request(self, request):
@@ -197,18 +201,18 @@ class Api:
     response = response.read()
     self.debug('Received '+response)
     try:
-      json = simplejson.loads(response)
+      s = json.loads(response)
     except Exception, ex:
       print response
       raise ex
 
-    if type(json) is dict:
-      if len(json['ERRORARRAY']) > 0:
-        raise ApiError(json['ERRORARRAY'])
+    if type(s) is dict:
+      if len(s['ERRORARRAY']) > 0:
+        raise ApiError(s['ERRORARRAY'])
       else:
-        return json['DATA']
+        return s['DATA']
     else:
-      return LowerCaseDict(json)
+      return LowerCaseDict(s)
 
   def __api_request(required = [], optional = []):
     for k in required:
@@ -251,7 +255,7 @@ class Api:
 
         if self.__batching:
           self.__batch_cache.append(request)
-          self.debug('Batched: '+simplejson.dumps(request))
+          self.debug('Batched: '+ json.dumps(request))
         else:
           return self.__send_request(request)
 

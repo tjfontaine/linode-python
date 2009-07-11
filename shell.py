@@ -62,7 +62,10 @@ if __name__ == "__main__":
   from getpass import getpass
   from os import environ
   import getopt, sys
-  import simplejson
+  try:
+    import json
+  except:
+    import simplejson as json
 
   if environ.has_key('LINODE_API_KEY'):
     key = environ['LINODE_API_KEY']
@@ -112,7 +115,7 @@ if __name__ == "__main__":
 
         params[param.replace('--', '')] = value
       try:
-        print simplejson.dumps(func(params), indent=2)
+        print json.dumps(func(params), indent=2)
       except api.MissingRequiredArgument, mra:
         print 'Missing option --'+mra.value
         print ''
@@ -127,9 +130,9 @@ if __name__ == "__main__":
   else:
     console = LinodeConsole()
 
-    console.runcode('import readline,rlcompleter,api,shell,simplejson')
+    console.runcode('import readline,rlcompleter,api,shell,json')
     console.runcode('readline.parse_and_bind("tab: complete")')
     console.runcode('readline.set_completer(shell.LinodeComplete().complete)')
-    console.runcode('def pp(text=None): print simplejson.dumps(text, indent=2)')
+    console.runcode('def pp(text=None): print json.dumps(text, indent=2)')
     console.locals.update({'linode':linode})
     console.interact()
