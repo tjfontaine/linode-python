@@ -126,7 +126,7 @@ class LowerCaseDict(dict):
 class Api:
   """Linode API (version 2) client class.
 
-  Instantiate with: Api(key='your_api_key'[, debug][, batching])
+  Instantiate with: Api([key='your_api_key'][, debug][, batching])
 
         key - Your API key, from "My Profile" in the LPM
         debug - Set to True to enable debugging
@@ -137,9 +137,13 @@ class Api:
   via JSON, which is then parsed and returned as a dictionary (or list
   of dictionaries).
 
-  In the event of problems, raises ApiError:
+  In the event of API problems, raises ApiError:
         api.ApiError: [{u'ERRORCODE': 99,
                         u'ERRORMESSAGE': u'Error Message'}]
+
+  If you do not specify a key, the only method you may use is
+  user_getapikey(username, password).  This will retrieve and store
+  the API key for a given user.
 
   Full documentation on the API can be found from Linode at:
         http://beta.linode.com/api/autodoc.cfm
