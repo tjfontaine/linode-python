@@ -582,14 +582,14 @@ class Api:
     availability in each datacenter.
 
     Returns:
-        {'Plan ID':
-            {u'XFER': Allowed transfer (GB/mo),
-             u'PRICE': Price (US dollars),
-             u'RAM': Maximum memory (MB),
-             u'LABEL': 'Name of plan',
-             u'AVAIL': {
-                u'Datacenter ID': Quantity, ...}
-            }
-        , ...}
+        [{u'PLANID': Plan ID,
+          u'XFER': Allowed transfer (GB/mo),
+          u'PRICE': Price (US dollars),
+          u'RAM': Maximum memory (MB),
+          u'LABEL': 'Name of plan',
+          u'DISK': Maximum disk allocation (GB),
+          u'AVAIL': {
+             u'Datacenter ID': Quantity, ...}
+         }, ...]
     """
     pass
