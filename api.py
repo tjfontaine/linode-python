@@ -288,6 +288,7 @@ class Api:
         [{u'STATUS': Status flag,
           u'DATACENTERID': Datacenter ID,
           u'ALERT_BWIN_ENABLED': 0 or 1,
+          u'ALERT_BWOUT_ENABLED': 0 or 1,
           u'ALERT_BWQUOTA_THRESHOLD': 0..100,
           u'BACKUPWEEKLYDAY': 0..6 (day of week; 0 is Sunday),
           u'ALERT_DISKIO_ENABLED': 0 or 1,
