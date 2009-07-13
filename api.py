@@ -285,28 +285,28 @@ class Api:
     """List information about your Linodes.
 
     Returns:
-        [{u'STATUS': Status flag,
-          u'DATACENTERID': Datacenter ID,
-          u'ALERT_BWIN_ENABLED': 0 or 1,
-          u'ALERT_BWOUT_ENABLED': 0 or 1,
-          u'ALERT_BWQUOTA_THRESHOLD': 0..100,
-          u'BACKUPWEEKLYDAY': 0..6 (day of week; 0 is Sunday),
-          u'ALERT_DISKIO_ENABLED': 0 or 1,
-          u'LINODEID': Linode ID,
+        [{u'ALERT_BWIN_ENABLED': 0 or 1,
           u'ALERT_BWIN_THRESHOLD': integer (Mb/sec?),
-          u'BACKUPWINDOW': some integer,
-          u'ALERT_BWQUOTA_ENABLED': 0 or 1,
-          u'TOTALRAM': available RAM (MB),
-          u'LPM_DISPLAYGROUP': 'group label',
-          u'ALERT_DISKIO_THRESHOLD': integer (IO ops/sec?),
-          u'ALERT_CPU_THRESHOLD': 0..400 (% CPU),
-          u'TOTALXFER': available bandwidth (GB/month),
+          u'ALERT_BWOUT_ENABLED': 0 or 1,
           u'ALERT_BWOUT_THRESHOLD': integer (Mb/sec?),
-          u'WATCHDOG': 0 or 1,
-          u'BACKUPSENABLED': 0 or 1,
-          u'LABEL': 'linode label',
+          u'ALERT_BWQUOTA_ENABLED': 0 or 1,
+          u'ALERT_BWQUOTA_THRESHOLD': 0..100,
           u'ALERT_CPU_ENABLED': 0 or 1,
-          u'TOTALHD': available disk (GB)}, ...]
+          u'ALERT_CPU_THRESHOLD': 0..400 (% CPU),
+          u'ALERT_DISKIO_ENABLED': 0 or 1,
+          u'ALERT_DISKIO_THRESHOLD': integer (IO ops/sec?),
+          u'BACKUPSENABLED': 0 or 1,
+          u'BACKUPWEEKLYDAY': 0..6 (day of week; 0 is Sunday),
+          u'BACKUPWINDOW': some integer,
+          u'DATACENTERID': Datacenter ID,
+          u'LABEL': 'linode label',
+          u'LINODEID': Linode ID,
+          u'LPM_DISPLAYGROUP': 'group label',
+          u'STATUS': Status flag,
+          u'TOTALHD': available disk (GB),
+          u'TOTALRAM': available RAM (MB),
+          u'TOTALXFER': available bandwidth (GB/month),
+          u'WATCHDOG': 0 or 1}, ...]
     """
     pass
 
@@ -384,21 +384,21 @@ class Api:
     """Lists all configuration profiles for a given Linode.
 
     Returns:
-        [{u'RAMLimit': Max memory (MB), 0 is unlimited,
-          u'RootDeviceCustom': '',
-          u'LinodeID': Linode ID,
-          u'helper_libtls': 0 or 1,   # maybe
+        [{u'Comments': 'comments field',
+          u'ConfigID': Config ID,
           u'DiskList': ',,,,,,,,' disk array,
+          u'helper_depmod': 0 or 1,
           u'helper_disableUpdateDB': 0 or 1,
+          u'helper_libtls': 0 or 1,   # maybe
+          u'helper_xen': 0 or 1,
+          u'KernelID': Kernel ID,
           u'Label': 'Profile name',
+          u'LinodeID': Linode ID,
+          u'RAMLimit': Max memory (MB), 0 is unlimited,
+          u'RootDeviceCustom': '',
           u'RootDeviceNum': root partition (1=first, 0=RootDeviceCustom),
           u'RootDeviceRO': 0 or 1,    # maybe
-          u'Comments': 'comments field',
-          u'RunLevel': in ['default', 'single', 'binbash'],
-          u'KernelID': Kernel ID,
-          u'ConfigID': Config ID,
-          u'helper_xen': 0 or 1,
-          u'helper_depmod': 0 or 1}, ...]
+          u'RunLevel': in ['default', 'single', 'binbash']}, ...]
     """
     pass
 
@@ -456,15 +456,15 @@ class Api:
     """Lists all disk images associated with a Linode.
 
     Returns:
-        [{u'STATUS': Status flag,
-          u'CREATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
-          u'UPDATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
-          u'LINODEID': Linode ID,
+        [{u'CREATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
+          u'DISKID': Disk ID,
           u'ISREADONLY': 0 or 1,
           u'LABEL': 'Disk label',
+          u'LINODEID': Linode ID,
+          u'SIZE': Size of disk (MB),
+          u'STATUS': Status flag,
           u'TYPE': in ['ext3', 'swap', 'raw'],
-          u'DISKID': Disk ID,
-          u'SIZE': Size of disk (MB)}, ...]
+          u'UPDATE_DT': u'YYYY-MM-DD hh:mm:ss.0'}, ...]
     """
     pass
 
@@ -524,11 +524,11 @@ class Api:
     """Lists a Linode's IP addresses.
 
     Returns:
-        [{u'RDNS_NAME': 'reverse.dns.name.here',
-          u'ISPUBLIC': 0 or 1,
+        [{u'ISPUBLIC': 0 or 1,
           u'IPADDRESS': '192.168.100.1',
           u'IPADDRESSID': IP address ID,
-          u'LINODEID': Linode ID}, ...]
+          u'LINODEID': Linode ID,
+          u'RDNS_NAME': 'reverse.dns.name.here'}, ...]
     """
     pass
 
@@ -537,16 +537,16 @@ class Api:
     """Returns the contents of the job queue.
 
     Returns:
-        [{u'HOST_FINISH_DT': 'yyyy-mm-dd hh:mm:ss.0' or '',
-          u'LINODEID': Linode ID,
-          u'JOBID': Job ID,
+        [{u'ACTION': 'API action' (e.g. u'linode.create'),
+          u'DURATION': Duration spent processing or '',
           u'ENTERED_DT': 'yyyy-mm-dd hh:mm:ss.0'
+          u'HOST_FINISH_DT': 'yyyy-mm-dd hh:mm:ss.0' or '',
           u'HOST_MESSAGE': 'response from host'
           u'HOST_START_DT': 'yyyy-mm-dd hh:mm:ss.0' or '',
-          u'DURATION': Duration spent processing or '',
           u'HOST_SUCCESS': 1 or '',
-          u'ACTION': 'API action' (e.g. u'linode.create'),
-          u'LABEL': 'Description of job'}, ...]
+          u'JOBID': Job ID,
+          u'LABEL': 'Description of job',
+          u'LINODEID': Linode ID}, ...]
     """
     pass
 
@@ -555,8 +555,8 @@ class Api:
     """List available kernels.
 
     Returns:
-        [{u'KERNELID': Kernel ID,
-          u'ISXEN': 0 or 1,
+        [{u'ISXEN': 0 or 1,
+          u'KERNELID': Kernel ID,
           u'LABEL': 'kernel version string'}, ...]
     """
     pass
@@ -566,11 +566,11 @@ class Api:
     """Returns a list of available Linux Distributions.
 
     Returns:
-        [{u'IS64BIT': 0 or 1,
-          u'CREATE_DT': 'YYYY-MM-DD hh:mm:ss.0',
+        [{u'CREATE_DT': 'YYYY-MM-DD hh:mm:ss.0',
           u'DISTRIBUTIONID': Distribution ID,
-          u'MINIMAGESIZE': MB required to deploy image,
-          u'LABEL': 'Description of image'}, ...]
+          u'IS64BIT': 0 or 1,
+          u'LABEL': 'Description of image',
+          u'MINIMAGESIZE': MB required to deploy image}, ...]
     """
     pass
 
@@ -590,12 +590,12 @@ class Api:
     availability in each datacenter.
 
     Returns:
-        [{u'PLANID': Plan ID,
-          u'XFER': Allowed transfer (GB/mo),
+        [{u'DISK': Maximum disk allocation (GB),
+          u'LABEL': 'Name of plan',
+          u'PLANID': Plan ID,
           u'PRICE': Price (US dollars),
           u'RAM': Maximum memory (MB),
-          u'LABEL': 'Name of plan',
-          u'DISK': Maximum disk allocation (GB),
+          u'XFER': Allowed transfer (GB/mo),
           u'AVAIL': {
              u'Datacenter ID': Quantity, ...}
          }, ...]
@@ -611,7 +611,7 @@ class Api:
     by the instance.
 
     Returns:
-        {u'USERNAME': Username,
-         u'API_KEY': API key string}
+        {u'API_KEY': API key string,
+         u'USERNAME': Username}
     """
     pass
