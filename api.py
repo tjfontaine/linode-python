@@ -145,7 +145,7 @@ class Api:
         http://beta.linode.com/api/autodoc.cfm
   """
 
-  def __init__(self, key, debug=False, batching=False):
+  def __init__(self, key=None, debug=False, batching=False):
     self.__key = key
     self.__urlopen = urllib2.urlopen
     self.__request = urllib2.Request
@@ -192,7 +192,10 @@ class Api:
     return self.__send_request(request)
 
   def __send_request(self, request):
-    request['api_key'] = self.__key
+    if self.__key:
+      request['api_key'] = self.__key
+    elif request['api_action'] != 'user.getapikey':
+      raise Exception('Must call user_getapikey to fetch key')
     request['api_responseFormat'] = 'json'
     request = urllib.urlencode(request)
     self.debug('Sending '+request)
@@ -210,6 +213,9 @@ class Api:
       if len(s['ERRORARRAY']) > 0:
         raise ApiError(s['ERRORARRAY'])
       else:
+        if s['ACTION'] == 'user.getapikey':
+          self.__key = s['DATA']['API_KEY']
+          self.debug('Set API key to '+self.__key)
         return s['DATA']
     else:
       return LowerCaseDict(s)
@@ -593,4 +599,9 @@ class Api:
              u'Datacenter ID': Quantity, ...}
          }, ...]
     """
+    pass
+
+  @__api_request(required=['username', 'password'])
+  def user_getapikey(self, request):
+    """Given a username and password, returns that username's API key."""
     pass
