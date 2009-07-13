@@ -503,7 +503,8 @@ class Api:
     """
     pass
 
-  @__api_request(required=['LinodeID', 'DistributionID', 'rootPass', 'Label', 'Size'])
+  @__api_request(required=['LinodeID', 'DistributionID', 'rootPass', 'Label',
+                           'Size'], optional=['rootSSHKey'])
   def linode_disk_createfromdistribution(self, request):
     """Submits a job to create a disk image from a Linode template.
 
