@@ -603,5 +603,14 @@ class Api:
 
   @__api_request(required=['username', 'password'])
   def user_getapikey(self, request):
-    """Given a username and password, returns that username's API key."""
+    """Given a username and password, returns the user's API key.  The
+    key is remembered by this instance for future use.
+
+    Please be advised that this will replace any previous key stored
+    by the instance.
+
+    Returns:
+        {u'USERNAME': Username,
+         u'API_KEY': API key string}
+    """
     pass
