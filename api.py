@@ -28,6 +28,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import logging
 import urllib
 import urllib2
 
@@ -130,8 +131,6 @@ class Api:
 
   Optional parameters:
         key - Your API key, from "My Profile" in the LPM (default: None)
-        debugging - Set to True to enable debugging (default: False)
-            (can also be set with "debugging" method)
         batching - Enable batching support (default: False)
 
   This interfaces with the Linode API (version 2) and receives a response
@@ -150,11 +149,10 @@ class Api:
         http://beta.linode.com/api/autodoc.cfm
   """
 
-  def __init__(self, key=None, debugging=False, batching=False):
+  def __init__(self, key=None, batching=False):
     self.__key = key
     self.__urlopen = urllib2.urlopen
     self.__request = urllib2.Request
-    self.__debug = debugging
     self.__batching = batching
     self.__batch_cache = []
 
@@ -167,19 +165,6 @@ class Api:
   def valid_params():
     """Returns a list of all parameters used by methods of this class."""
     return ApiInfo.valid_params.keys()
-
-  @property
-  def debugging(self):
-    """Sets debugging mode.  value=True enables and value=False disables."""
-    return self.__debug
-
-  @debugging.setter
-  def debugging(self, value):
-    self.__debug = value
-
-  def debug(self, msg):
-    if self.__debug:
-      print msg
 
   @property
   def batching(self):
@@ -205,26 +190,31 @@ class Api:
       request['api_key'] = self.__key
     elif request['api_action'] != 'user.getapikey':
       raise Exception('Must call user_getapikey to fetch key')
+
     request['api_responseFormat'] = 'json'
+
+    logging.debug('Parmaters '+str(request))
     request = urllib.urlencode(request)
-    self.debug('Sending '+request)
+
     req = self.__request(LINODE_API_URL, request)
     response = self.__urlopen(req)
     response = response.read()
-    self.debug('Received '+response)
+
+    logging.debug('Raw Response: '+response)
+
     try:
       s = json.loads(response)
     except Exception, ex:
       print response
       raise ex
 
-    if type(s) is dict:
+    if isinstance(s, dict):
       if len(s['ERRORARRAY']) > 0:
         raise ApiError(s['ERRORARRAY'])
       else:
         if s['ACTION'] == 'user.getapikey':
           self.__key = s['DATA']['API_KEY']
-          self.debug('Set API key to '+self.__key)
+          logging.debug('API key is: '+self.__key)
         return s['DATA']
     else:
       return LowerCaseDict(s)
@@ -244,24 +234,17 @@ class Api:
       if not ApiInfo.valid_commands.has_key(func.__name__):
         ApiInfo.valid_commands[func.__name__] = True
 
-      def wrapper(self, mparams = {}, *__args ,**__kw):
-        request = {'api_action' : func.__name__.replace('_', '.')}
+      def wrapper(self, *__args ,**__kw):
+        request = LowerCaseDict()
+        request['api_action'] = func.__name__.replace('_', '.')
 
-        if len(mparams) == 0: #only self, no passed parameters
-          params = __kw
-        else: #parameters passed, expect a dict
-          params = mparams
-
-        params = dict([(key.lower(),value) for key,value in params.iteritems() if value is not None])
+        params = LowerCaseDict(__kw)
 
         for k in required:
-          k = k.lower()
-
           if not params.has_key(k):
             raise MissingRequiredArgument(k)
 
         for k in params:
-          k = k.lower()
           request[k] = params[k]
 
         result = func(self, request)
@@ -270,7 +253,7 @@ class Api:
 
         if self.__batching:
           self.__batch_cache.append(request)
-          self.debug('Batched: '+ json.dumps(request))
+          logging.debug('Batched: '+ json.dumps(request))
         else:
           return self.__send_request(request)
 

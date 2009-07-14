@@ -4,7 +4,7 @@ from datetime import datetime
 from api import Api, LowerCaseDict
 from fields import *
 
-_api = Api(environ['LINODE_API_KEY'], debug=True)
+_api = Api(environ['LINODE_API_KEY'])
 
 _id_cache = {}
 
