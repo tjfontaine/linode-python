@@ -116,8 +116,8 @@ class HighLevel(api.Api):
     self.__domain_cache_name = {}
     self.__domain_cache_id   = {}
     doms = self.domainList()
-    if not self.batching():
-      self.batching(True)
+    if not self.batching:
+      self.batching = True
       for d in doms:
         self.__domain_cache_name[d['DOMAIN']] = d
         self.__domain_cache_name[d['DOMAIN']]['rr'] = {}
@@ -127,7 +127,7 @@ class HighLevel(api.Api):
       for d in results:
         for rr in d['DATA']:
           self.__domain_cache_name[self.__domain_cache_id[rr['DOMAINID']]]['rr'][rr['NAME']] = rr
-      self.batching(False)
+      self.batching = False
   
   @__api_request(['Domain'])
   @requires_cache

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """
 A Python shell to interact with the Linode API
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
         params[param.replace('--', '')] = value
       try:
-        print json.dumps(func(params), indent=2)
+        print json.dumps(func(**params), indent=2)
       except api.MissingRequiredArgument, mra:
         print 'Missing option --'+mra.value
         print ''
