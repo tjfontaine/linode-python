@@ -130,7 +130,7 @@ class Api:
 
   Optional parameters:
         key - Your API key, from "My Profile" in the LPM (default: None)
-        debug - Set to True to enable debugging (default: False)
+        debugging - Set to True to enable debugging (default: False)
             (can also be set with "debugging" method)
         batching - Enable batching support (default: False)
 
@@ -150,11 +150,11 @@ class Api:
         http://beta.linode.com/api/autodoc.cfm
   """
 
-  def __init__(self, key=None, debug=False, batching=False):
+  def __init__(self, key=None, debugging=False, batching=False):
     self.__key = key
     self.__urlopen = urllib2.urlopen
     self.__request = urllib2.Request
-    self.__debug = debug
+    self.__debug = debugging
     self.__batching = batching
     self.__batch_cache = []
 
@@ -168,23 +168,27 @@ class Api:
     """Returns a list of all parameters used by methods of this class."""
     return ApiInfo.valid_params.keys()
 
-  def debugging(self, value = None):
+  @property
+  def debugging(self):
     """Sets debugging mode.  value=True enables and value=False disables."""
-    if value is not None:
-      self.__debug = value
-
     return self.__debug
+
+  @debugging.setter
+  def debugging(self, value):
+    self.__debug = value
 
   def debug(self, msg):
     if self.__debug:
       print msg
 
-  def batching(self, value = None):
+  @property
+  def batching(self):
     """Sets batching mode.  value=True enables and value=False disables."""
-    if value is not None:
-      self.__batching = value
-
     return self.__batching
+
+  @batching.setter
+  def batching(self, value):
+    self.__batching = value
 
   def batchFlush(self):
     """Initiates a batch flush.  Raises Exception if not in batching mode."""
