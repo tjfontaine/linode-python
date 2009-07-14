@@ -219,7 +219,7 @@ class Api:
     else:
       return LowerCaseDict(s)
 
-  def __api_request(required = [], optional = []):
+  def __api_request(required=[], optional=[]):
     for k in required:
       k = k.lower()
       if not ApiInfo.valid_params.has_key(k):
@@ -234,11 +234,11 @@ class Api:
       if not ApiInfo.valid_commands.has_key(func.__name__):
         ApiInfo.valid_commands[func.__name__] = True
 
-      def wrapper(self, *__args ,**__kw):
+      def wrapper(self, **kw):
         request = LowerCaseDict()
         request['api_action'] = func.__name__.replace('_', '.')
 
-        params = LowerCaseDict(__kw)
+        params = LowerCaseDict(kw)
 
         for k in required:
           if not params.has_key(k):
