@@ -244,11 +244,11 @@ class LinodeDisk(LinodeObject):
     return job
 
   @classmethod
-  def create_from_distribution(self, linode, distribution, root_pass, label, size):
+  def create_from_distribution(self, linode, distribution, root_pass, label, size, ssh_key=None):
     l = ForeignField(Linode).to_linode(linode)
     d = ForeignField(Distribution).to_linode(distribution)
     ret = _api.linode_disk_createfromdistribution(linodeid=l, distributionid=d,
-            rootpass=root_pass, label=label, size=size)
+            rootpass=root_pass, label=label, size=size, rootsshkey=ssh_key)
     disk = self.get(id=ret['DiskID'], linode=linode)
     job = LinodeJob(id=ret['JobID'], linode=linode)
     return (disk, job)
@@ -303,7 +303,10 @@ class LinodeIP(LinodeObject):
   list_method = _api.linode_ip_list
 
 def fill_cache():
+  #_api.batching(True)
   a = [i for i in Linode.list()]
   a = [i for i in Datacenter.list()]
-  #a = [i for i in LinodePlan.list()]
+  a = [i for i in LinodePlan.list()]
   a = [i for i in Kernel.list()]
+  #_api.batchFlush()
+  #_api.batching(False)
