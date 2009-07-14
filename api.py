@@ -126,14 +126,15 @@ class LowerCaseDict(dict):
 class Api:
   """Linode API (version 2) client class.
 
-  Instantiate with: Api([key='your_api_key'][, debug][, batching])
+  Instantiate with: Api(), or Api(optional parameters)
 
-        key - Your API key, from "My Profile" in the LPM
-        debug - Set to True to enable debugging
+  Optional parameters:
+        key - Your API key, from "My Profile" in the LPM (default: None)
+        debug - Set to True to enable debugging (default: False)
             (can also be set with "debugging" method)
-        batching - Enable batching support
+        batching - Enable batching support (default: False)
 
-  Interfaces with the Linode API (version 2) and receives a response
+  This interfaces with the Linode API (version 2) and receives a response
   via JSON, which is then parsed and returned as a dictionary (or list
   of dictionaries).
 
