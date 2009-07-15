@@ -153,7 +153,7 @@ class Api:
     self.__key = key
     self.__urlopen = urllib2.urlopen
     self.__request = urllib2.Request
-    self.__batching = batching
+    self.batching = batching
     self.__batch_cache = []
 
   @staticmethod
@@ -166,18 +166,9 @@ class Api:
     """Returns a list of all parameters used by methods of this class."""
     return ApiInfo.valid_params.keys()
 
-  @property
-  def batching(self):
-    """Sets batching mode.  value=True enables and value=False disables."""
-    return self.__batching
-
-  @batching.setter
-  def batching(self, value):
-    self.__batching = value
-
   def batchFlush(self):
     """Initiates a batch flush.  Raises Exception if not in batching mode."""
-    if not self.__batching:
+    if not self.batching:
       raise Exception('Cannot flush requests when not batching')
 
     s = json.dumps(self.__batch_cache)
@@ -220,6 +211,7 @@ class Api:
       return LowerCaseDict(s)
 
   def __api_request(required=[], optional=[]):
+    """Decorator to define required and optional paramters"""
     for k in required:
       k = k.lower()
       if not ApiInfo.valid_params.has_key(k):
@@ -251,7 +243,7 @@ class Api:
         if result is not None:
           request = result
 
-        if self.__batching:
+        if self.batching:
           self.__batch_cache.append(request)
           logging.debug('Batched: '+ json.dumps(request))
         else:
