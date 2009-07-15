@@ -45,7 +45,11 @@ class LinodeObject(object):
     s = []
     for k,v in self.fields.items():
       if self.__entry.has_key(v.field):
-        s.append('%s: %s' % (k, str(v.to_py(self.__entry[v.field]))))
+        value = v.to_py(self.__entry[v.field])
+        if isinstance(value, list):
+          s.append('%s: [%s]' % (k, ', '.join([str(x) for x in value])))
+        else:
+          s.append('%s: %s' % (k, str(value)))
     return '['+', '.join(s)+']'
 
   def save(self):

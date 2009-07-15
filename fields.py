@@ -9,7 +9,7 @@ class Field(object):
 
 class IntField(Field):
   def to_py(self, value):
-    if value is not None:
+    if value is not None and value != '':
       return int(value)
 
   to_linode = to_py
@@ -57,7 +57,7 @@ class ListField(Field):
     return self.__delim.join([str(self.__type.to_linode(v)) for v in value])
 
   def to_py(self, value):
-    return [self.__type.to_py(v) for v in value.split(self.__delim)]
+    return [self.__type.to_py(v) for v in value.split(self.__delim) if v != '']
 
 class DateTimeField(Field):
   to_py = lambda self, value: datetime.strptime(value, '%Y-%m-%d %H:%M:%S.0')
