@@ -99,12 +99,21 @@ class LinodeObject(object):
 
     if not result:
       result = LowerCaseDict(self.list_method(**kwargs)[0])
-      _id_cache[self][result[self.primary_key]] = result
-
-    return self(result)
+      o = self(result)
+      o.cache_add()
+      return o
+    else:
+      return self(result)
 
   def cache_remove(self):
     del _id_cache[self.__class__][self.__entry[self.primary_key]]
+
+  def cache_add(self):
+    key = self.__class__
+    if not _id_cache.has_key(key):
+      _id_cache[key] = {}
+
+    _id_cache[key][self.__entry[self.primary_key]] = self.__entry
 
 class Datacenter(LinodeObject):
   fields = {
@@ -302,11 +311,22 @@ class LinodeIP(LinodeObject):
 
   list_method = _api.linode_ip_list
 
+def _iter_class(self, results):
+  _id_cache[self] = {}
+  results = LowerCaseDict(results)
+
+  d = results['data']
+  for i in d: self(i).cache_add()
+
 def fill_cache():
-  #_api.batching(True)
-  a = [i for i in Linode.list()]
-  a = [i for i in Datacenter.list()]
-  a = [i for i in LinodePlan.list()]
-  a = [i for i in Kernel.list()]
-  #_api.batchFlush()
-  #_api.batching(False)
+  _api.batching = True
+  _api.linode_list()
+  _api.avail_linodeplans()
+  _api.avail_datacenters()
+  _api.avail_distributions()
+  _api.avail_kernels()
+  ret = _api.batchFlush()
+  _api.batching = False
+
+  for i,k in enumerate([Linode, LinodePlan, Datacenter, Distribution, Kernel]):
+    _iter_class(k, ret[i])
