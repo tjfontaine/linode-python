@@ -200,6 +200,7 @@ class Api:
       raise ex
 
     if isinstance(s, dict):
+      s = LowerCaseDict(s)
       if len(s['ERRORARRAY']) > 0:
         raise ApiError(s['ERRORARRAY'])
       else:
@@ -208,7 +209,7 @@ class Api:
           logging.debug('API key is: '+self.__key)
         return s['DATA']
     else:
-      return LowerCaseDict(s)
+      return s
 
   def __api_request(required=[], optional=[]):
     """Decorator to define required and optional paramters"""
