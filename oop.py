@@ -1,5 +1,6 @@
+import logging
+
 from os import environ
-from datetime import datetime
 
 from api import Api, LowerCaseDict
 from fields import *
@@ -16,6 +17,7 @@ class LinodeObject(object):
   list_method   = None
 
   def __init__(self, entry={}):
+    entry = dict([(str(k), v) for k,v in entry.items()])
     self.__entry = LowerCaseDict(entry)
 
   def __getattr__(self, name):
@@ -351,5 +353,4 @@ def fill_cache():
   _api.batching = False
 
 def setup_logging():
-  import logging
   logging.basicConfig(level=logging.DEBUG)
