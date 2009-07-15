@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Field(object):
   to_py = lambda self, value: value
   to_linode = to_py
@@ -58,8 +60,8 @@ class ListField(Field):
     return [self.__type.to_py(v) for v in value.split(self.__delim)]
 
 class DateTimeField(Field):
-  to_py = lambda self, value: datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-  to_linode = lambda self, value: value.strftime('%Y-%m-%d %H:%M:%S')
+  to_py = lambda self, value: datetime.strptime(value, '%Y-%m-%d %H:%M:%S.0')
+  to_linode = lambda self, value: value.strftime('%Y-%m-%d %H:%M:%S.0')
 
 class ForeignField(Field):
   def __init__(self, field):
