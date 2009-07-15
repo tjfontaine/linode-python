@@ -74,8 +74,9 @@ class LinodeObject(object):
 
     for l in self.list_method(**kwargs):
       l = LowerCaseDict(l)
-      _id_cache[self][l[self.primary_key]] = l
-      yield self(l)
+      o = self(l)
+      o.cache_add()
+      yield o
 
   @classmethod
   def get(self, **kw):
@@ -326,7 +327,25 @@ def fill_cache():
   _api.avail_distributions()
   _api.avail_kernels()
   ret = _api.batchFlush()
-  _api.batching = False
 
   for i,k in enumerate([Linode, LinodePlan, Datacenter, Distribution, Kernel]):
     _iter_class(k, ret[i])
+
+  for k in _id_cache[Linode].keys():
+    _api.linode_config_list(linodeid=k)
+    _api.linode_disk_list(linodeid=k)
+
+  ret = _api.batchFlush()
+
+  for r in ret:
+    r = LowerCaseDict(r)
+    if r['action'] == 'linode.config.list':
+      _iter_class(LinodeConfig, r)
+    elif r['action'] == 'linode.disk.list':
+      _iter_class(LinodeDisk, r)
+
+  _api.batching = False
+
+def setup_logging():
+  import logging
+  logging.basicConfig(level=logging.DEBUG)
