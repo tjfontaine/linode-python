@@ -600,3 +600,40 @@ class Api:
          u'USERNAME': Username}
     """
     pass
+
+  @__api_request()
+  def domain_list(self, request):
+    pass
+
+  @__api_request(required=['DomainID'])
+  def domain_delete(self, request):
+    pass
+
+  @__api_request(required=['Domain','Type','SOA_Email'], optional=[
+                                                                  'Refresh_sec',
+                                                                  'Retry_sec',
+                                                                  'Expire_sec',
+                                                                  'TTL_sec',
+                                                                  'status',
+                                                                  'master_ips',
+                                                                ])
+  def domain_create(self, request):
+    pass
+
+  @__api_request(required=['DomainID'], optional=[
+                                                  'Domain',
+                                                  'Type',
+                                                  'SOA_Email',
+                                                  'Refresh_sec',
+                                                  'Retry_sec',
+                                                  'Expire_sec',
+                                                  'TTL_sec',
+                                                  'status',
+                                                  'master_ips',
+                                                 ])
+  def domain_update(self, request):
+    pass
+
+  @__api_request(required=['DomainID'], optional=['DomainResourceID'])
+  def domain_resource_list(self, request):
+    pass
