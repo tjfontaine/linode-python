@@ -270,7 +270,7 @@ class Api:
           wrapper.__doc__ += '\n    Returns list of dictionaries:\n\t[{\n'
           wrapper.__doc__ += ''.join(['\t  %s:\t%s\n'
                               % (p, returns[0][p]) for p in returns[0].keys()])
-          wrapper.__doc__ += '\t}, ...]\n'
+          wrapper.__doc__ += '\t }, ...]\n'
         else:
           wrapper.__doc__ += '\n    Returns dictionary:\n\t{\n'
           wrapper.__doc__ += ''.join(['\t %s:\t%s\n'
@@ -280,285 +280,252 @@ class Api:
       return wrapper
     return decorator
 
-  @__api_request(optional=['LinodeID'])
+  @__api_request(optional=['LinodeID'],
+                 returns=[{u'ALERT_BWIN_ENABLED': '0 or 1',
+                           u'ALERT_BWIN_THRESHOLD': 'integer (Mb/sec?)',
+                           u'ALERT_BWOUT_ENABLED': '0 or 1',
+                           u'ALERT_BWOUT_THRESHOLD': 'integer (Mb/sec?)',
+                           u'ALERT_BWQUOTA_ENABLED': '0 or 1',
+                           u'ALERT_BWQUOTA_THRESHOLD': '0..100',
+                           u'ALERT_CPU_ENABLED': '0 or 1',
+                           u'ALERT_CPU_THRESHOLD': '0..400 (% CPU)',
+                           u'ALERT_DISKIO_ENABLED': '0 or 1',
+                           u'ALERT_DISKIO_THRESHOLD': 'integer (IO ops/sec?)',
+                           u'BACKUPSENABLED': '0 or 1',
+                           u'BACKUPWEEKLYDAY': '0..6 (day of week, 0 = Sunday)',
+                           u'BACKUPWINDOW': 'some integer',
+                           u'DATACENTERID': 'Datacenter ID',
+                           u'LABEL': 'linode label',
+                           u'LINODEID': 'Linode ID',
+                           u'LPM_DISPLAYGROUP': 'group label',
+                           u'STATUS': 'Status flag',
+                           u'TOTALHD': 'available disk (GB)',
+                           u'TOTALRAM': 'available RAM (MB)',
+                           u'TOTALXFER': 'available bandwidth (GB/month)',
+                           u'WATCHDOG': '0 or 1'}])
   def linode_list(self, request):
-    """List information about your Linodes.
-
-    Returns:
-        [{u'ALERT_BWIN_ENABLED': 0 or 1,
-          u'ALERT_BWIN_THRESHOLD': integer (Mb/sec?),
-          u'ALERT_BWOUT_ENABLED': 0 or 1,
-          u'ALERT_BWOUT_THRESHOLD': integer (Mb/sec?),
-          u'ALERT_BWQUOTA_ENABLED': 0 or 1,
-          u'ALERT_BWQUOTA_THRESHOLD': 0..100,
-          u'ALERT_CPU_ENABLED': 0 or 1,
-          u'ALERT_CPU_THRESHOLD': 0..400 (% CPU),
-          u'ALERT_DISKIO_ENABLED': 0 or 1,
-          u'ALERT_DISKIO_THRESHOLD': integer (IO ops/sec?),
-          u'BACKUPSENABLED': 0 or 1,
-          u'BACKUPWEEKLYDAY': 0..6 (day of week; 0 is Sunday),
-          u'BACKUPWINDOW': some integer,
-          u'DATACENTERID': Datacenter ID,
-          u'LABEL': 'linode label',
-          u'LINODEID': Linode ID,
-          u'LPM_DISPLAYGROUP': 'group label',
-          u'STATUS': Status flag,
-          u'TOTALHD': available disk (GB),
-          u'TOTALRAM': available RAM (MB),
-          u'TOTALXFER': available bandwidth (GB/month),
-          u'WATCHDOG': 0 or 1}, ...]
-    """
+    """List information about your Linodes."""
     pass
 
-  @__api_request(required=['LinodeID'], optional=['Label',
-                                                  'lpm_displayGroup',
-                                                  'Alert_cpu_enabled',
-                                                  'Alert_cpu_threshold',
-                                                  'Alert_diskio_enabled',
-                                                  'Alert_diskio_threshold',
-                                                  'Alert_bwin_enabled',
-                                                  'Alert_bwin_threshold',
-                                                  'Alert_bwout_enabled',
-                                                  'Alert_bwout_threshold',
-                                                  'Alert_bwquota_enabled',
-                                                  'Alert_bwquota_threshold',
-                                                  'backupWindow',
-                                                  'backupWeeklyDay',
-                                                  'watchdog',
-                                                 ])
+  @__api_request(required=['LinodeID'],
+                 optional=['Label', 'lpm_displayGroup', 'Alert_cpu_enabled',
+                           'Alert_cpu_threshold', 'Alert_diskio_enabled',
+                           'Alert_diskio_threshold', 'Alert_bwin_enabled',
+                           'Alert_bwin_threshold', 'Alert_bwout_enabled',
+                           'Alert_bwout_threshold', 'Alert_bwquota_enabled',
+                           'Alert_bwquota_threshold', 'backupWindow',
+                           'backupWeeklyDay', 'watchdog'],
+                 returns={u'LinodeID': 'LinodeID'})
   def linode_update(self, request):
     """Update information about, or settings for, a Linode.
 
     See linode_list.__doc__ for information on parameters.
-
-    Returns {u'LinodeID': LinodeID} on successful change.
     """
     pass
 
-  @__api_request(required=['DatacenterID', 'PlanID', 'PaymentTerm'])
+  @__api_request(required=['DatacenterID', 'PlanID', 'PaymentTerm'],
+                 returns={u'LinodeID': 'New Linode ID'})
   def linode_create(self, request):
     """Create a new Linode.
 
     WARNING: This will create a billing event.
-
-    Returns {u'LinodeID': LinodeID} on successful creation.
     """
     pass
 
-  @__api_request(required=['LinodeID'])
+  @__api_request(required=['LinodeID'], returns={u'JobID': 'Job ID'})
   def linode_shutdown(self, request):
     """Submit a shutdown job for a Linode.
 
-    Returns {u'JobID': JobID} on successful job submission.
+    On job submission, returns the job ID.  Does not wait for job
+    completion (see linode_job_list).
     """
     pass
 
-  @__api_request(required=['LinodeID'], optional=['ConfigID'])
+  @__api_request(required=['LinodeID'], optional=['ConfigID'],
+                 returns={u'JobID': 'Job ID'})
   def linode_boot(self, request):
     """Submit a boot job for a Linode.
 
-    Returns {u'JobID': JobID} on successful job submission.
+    On job submission, returns the job ID.  Does not wait for job
+    completion (see linode_job_list).
     """
     pass
 
-  @__api_request(required=['LinodeID'])
+  @__api_request(required=['LinodeID'],
+                 returns={u'LinodeID': 'Destroyed Linode ID'})
   def linode_delete(self, request):
     """Completely, immediately, and totally deletes a Linode.
 
     WARNING: This will permenantly delete a Linode, running or no.
-
-    Returns {u'LinodeID': LinodeID} on successful destruction.
     """
     pass
 
-  @__api_request(required=['LinodeID'], optional=['ConfigID'])
+  @__api_request(required=['LinodeID'], optional=['ConfigID'],
+                 returns={u'JobID': 'Job ID'})
   def linode_reboot(self, request):
     """Submit a reboot job for a Linode.
     
-    Returns {u'JobID': JobID} on successful job submission.
+    On job submission, returns the job ID.  Does not wait for job
+    completion (see linode_job_list).
     """
     pass
 
-  @__api_request(required=['LinodeID'])
+  @__api_request(required=['LinodeID'],
+                 returns=[{u'Comments': 'comments field',
+                           u'ConfigID': 'Config ID',
+                           u'DiskList': "',,,,,,,,' disk array",
+                           u'helper_depmod': '0 or 1',
+                           u'helper_disableUpdateDB': '0 or 1',
+                           u'helper_libtls': '0 or 1',
+                           u'helper_xen': '0 or 1',
+                           u'KernelID': 'Kernel ID',
+                           u'Label': 'Profile name',
+                           u'LinodeID': 'Linode ID',
+                           u'RAMLimit': 'Max memory (MB), 0 is unlimited',
+                           u'RootDeviceCustom': '',
+                           u'RootDeviceNum': 'root partition (1=first, 0=RootDeviceCustom)',
+                           u'RootDeviceRO': '0 or 1',
+                           u'RunLevel': "in ['default', 'single', 'binbash'"}])
   def linode_config_list(self, request):
-    """Lists all configuration profiles for a given Linode.
-
-    Returns:
-        [{u'Comments': 'comments field',
-          u'ConfigID': Config ID,
-          u'DiskList': ',,,,,,,,' disk array,
-          u'helper_depmod': 0 or 1,
-          u'helper_disableUpdateDB': 0 or 1,
-          u'helper_libtls': 0 or 1,   # maybe
-          u'helper_xen': 0 or 1,
-          u'KernelID': Kernel ID,
-          u'Label': 'Profile name',
-          u'LinodeID': Linode ID,
-          u'RAMLimit': Max memory (MB), 0 is unlimited,
-          u'RootDeviceCustom': '',
-          u'RootDeviceNum': root partition (1=first, 0=RootDeviceCustom),
-          u'RootDeviceRO': 0 or 1,    # maybe
-          u'RunLevel': in ['default', 'single', 'binbash']}, ...]
-    """
+    """Lists all configuration profiles for a given Linode."""
     pass
 
-  @__api_request(required=['LinodeID', 'ConfigID'], optional=[
-                                                            'KernelID',
-                                                            'Label',
-                                                            'Comments',
-                                                            'RAMLimit',
-                                                            'DiskList',
-                                                            'RunLevel',
-                                                            'RootDeviceNum',
-                                                            'RootDeviceCustom',
-                                                            'RootDeviceRO',
-                                                            'helper_disableUpdateDB',
-                                                            'helper_xen',
-                                                            'helper_depmod',
-                                                          ])
+  @__api_request(required=['LinodeID', 'ConfigID'],
+                 optional=['KernelID', 'Label', 'Comments', 'RAMLimit',
+                           'DiskList', 'RunLevel', 'RootDeviceNum',
+                           'RootDeviceCustom', 'RootDeviceRO',
+                           'helper_disableUpdateDB', 'helper_xen',
+                           'helper_depmod'],
+                 returns={u'ConfigID': 'Config ID'})
   def linode_config_update(self, request):
-    """Updates a configuration profile.
-
-    Returns {u'ConfigID': Config ID} on successful update.
-    """
+    """Updates a configuration profile."""
     pass
 
   @__api_request(required=['LinodeID', 'KernelID', 'Label', 'Disklist'],
-                                                 optional=[
-                                                            'Comments',
-                                                            'RAMLimit',
-                                                            'RunLevel',
-                                                            'RootDeviceNum',
-                                                            'RootDeviceCustom',
-                                                            'RootDeviceRO',
-                                                            'helper_disableUpdateDB',
-                                                            'helper_xen',
-                                                            'helper_depmod',
-                                                          ])
+                 optional=['Comments', 'RAMLimit', 'RunLevel',
+                           'RootDeviceNum', 'RootDeviceCustom',
+                           'RootDeviceRO', 'helper_disableUpdateDB',
+                           'helper_xen', 'helper_depmod'],
+                 returns={u'ConfigID': 'Config ID'})
   def linode_config_create(self, request):
-    """Creates a configuration profile.
-
-    Returns {u'ConfigID': Config ID} on successful creation.
-    """
+    """Creates a configuration profile."""
     pass
 
-  @__api_request(required=['LinodeID', 'ConfigID'])
+  @__api_request(required=['LinodeID', 'ConfigID'],
+                 returns={u'ConfigID': 'Config ID'})
   def linode_config_delete(self, request):
     """Deletes a configuration profile.  This does not delete the Linode
-    itself, nor its disk images.
-
-    Returns {u'ConfigID': Config ID} on successful deletion.
+    itself, nor its disk images (see linode_disk_delete, linode_delete).
     """
     pass
   
-  @__api_request(required=['LinodeID'])
+  @__api_request(required=['LinodeID'],
+                 returns=[{u'CREATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
+                           u'DISKID': 'Disk ID',
+                           u'ISREADONLY': '0 or 1',
+                           u'LABEL': 'Disk label',
+                           u'LINODEID': 'Linode ID',
+                           u'SIZE': 'Size of disk (MB)',
+                           u'STATUS': 'Status flag',
+                           u'TYPE': "in ['ext3', 'swap', 'raw']",
+                           u'UPDATE_DT': u'YYYY-MM-DD hh:mm:ss.0'}])
   def linode_disk_list(self, request):
-    """Lists all disk images associated with a Linode.
-
-    Returns:
-        [{u'CREATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
-          u'DISKID': Disk ID,
-          u'ISREADONLY': 0 or 1,
-          u'LABEL': 'Disk label',
-          u'LINODEID': Linode ID,
-          u'SIZE': Size of disk (MB),
-          u'STATUS': Status flag,
-          u'TYPE': in ['ext3', 'swap', 'raw'],
-          u'UPDATE_DT': u'YYYY-MM-DD hh:mm:ss.0'}, ...]
-    """
+    """Lists all disk images associated with a Linode."""
     pass
 
-  @__api_request(required=['LinodeID', 'DiskID'], optional=['Label', 'isReadOnly'])
+  @__api_request(required=['LinodeID', 'DiskID'],
+                 optional=['Label', 'isReadOnly'],
+                 returns={u'DiskID': 'Disk ID'})
   def linode_disk_update(self, request):
-    """Updates the information about a disk image.
-
-    Returns {u'DiskID': Disk ID} on successful update.
-    """
+    """Updates the information about a disk image."""
     pass
 
-  @__api_request(required=['LinodeID', 'Type', 'Size', 'Label'], optional=['isReadOnly'])
+  @__api_request(required=['LinodeID', 'Type', 'Size', 'Label'],
+                 optional=['isReadOnly'],
+                 returns={u'DiskID': 'Disk ID', u'JobID': 'Job ID'})
   def linode_disk_create(self, request):
     """Submits a job to create a new disk image.
 
-    Returns {u'DiskID': Disk ID, u'JobID': Job ID} on job submission.
+    On job submission, returns the disk ID and job ID.  Does not wait for
+    job completion (see linode_job_list).
     """
     pass
 
-  @__api_request(required=['LinodeID', 'DiskID'])
+  @__api_request(required=['LinodeID', 'DiskID'],
+                 returns={u'DiskID': 'New Disk ID', u'JobID': 'Job ID'})
   def linode_disk_duplicate(self, request):
     """Submits a job to preform a bit-for-bit copy of a disk image.
 
-    Returns {u'DiskID': New Disk ID, u'JobID': Job ID} on job submission.
+    On job submission, returns the disk ID and job ID.  Does not wait for
+    job completion (see linode_job_list).
     """
     pass
 
-  @__api_request(required=['LinodeID', 'DiskID'])
+  @__api_request(required=['LinodeID', 'DiskID'],
+                 returns={u'DiskID': 'Deleted Disk ID', u'JobID': 'Job ID'})
   def linode_disk_delete(self, request):
     """Submits a job to delete a disk image.
 
     WARNING: All data on the disk image will be lost forever.
 
-    Returns {u'DiskID': Deleted Disk ID, u'JobID': Job ID} on job submission.
+    On job submission, returns the disk ID and job ID.  Does not wait for
+    job completion (see linode_job_list).
     """
     pass
 
-  @__api_request(required=['LinodeID', 'DiskID', 'Size'])
+  @__api_request(required=['LinodeID', 'DiskID', 'Size'],
+                 returns={u'DiskID': 'Disk ID', u'JobID': 'Job ID'})
   def linode_disk_resize(self, request):
     """Submits a job to resize a partition.
 
-    Returns {u'DiskID': Disk ID, u'JobID': Job ID} on job submission.
+    On job submission, returns the disk ID and job ID.  Does not wait for
+    job completion (see linode_job_list).
     """
     pass
 
   @__api_request(required=['LinodeID', 'DistributionID', 'rootPass', 'Label',
-                           'Size'], optional=['rootSSHKey'])
+                           'Size'],
+                 optional=['rootSSHKey'],
+                 returns={u'DiskID': 'New Disk ID', u'JobID': 'Job ID'})
   def linode_disk_createfromdistribution(self, request):
     """Submits a job to create a disk image from a Linode template.
 
-    Returns {u'DiskID': New Disk ID, u'JobID': Job ID} on job submission.
+    On job submission, returns the disk ID and job ID.  Does not wait for
+    job completion (see linode_job_list).
     """
     pass
 
-  @__api_request(required=['LinodeID'], optional=['IPAddressID'])
+  @__api_request(required=['LinodeID'], optional=['IPAddressID'],
+                 returns=[{u'ISPUBLIC': '0 or 1',
+                           u'IPADDRESS': '192.168.100.1',
+                           u'IPADDRESSID': 'IP address ID',
+                           u'LINODEID': 'Linode ID',
+                           u'RDNS_NAME': 'reverse.dns.name.here'}])
   def linode_ip_list(self, request):
-    """Lists a Linode's IP addresses.
-
-    Returns:
-        [{u'ISPUBLIC': 0 or 1,
-          u'IPADDRESS': '192.168.100.1',
-          u'IPADDRESSID': IP address ID,
-          u'LINODEID': Linode ID,
-          u'RDNS_NAME': 'reverse.dns.name.here'}, ...]
-    """
+    """Lists a Linode's IP addresses."""
     pass
 
-  @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'])
+  @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'],
+                 returns=[{u'ACTION': "API action (e.g. u'linode.create')",
+                           u'DURATION': "Duration spent processing or ''",
+                           u'ENTERED_DT': 'yyyy-mm-dd hh:mm:ss.0',
+                           u'HOST_FINISH_DT': "'yyyy-mm-dd hh:mm:ss.0' or ''",
+                           u'HOST_MESSAGE': 'response from host',
+                           u'HOST_START_DT': "'yyyy-mm-dd hh:mm:ss.0' or ''",
+                           u'HOST_SUCCESS': "1 or ''",
+                           u'JOBID': 'Job ID',
+                           u'LABEL': 'Description of job',
+                           u'LINODEID': 'Linode ID'}])
   def linode_job_list(self, request):
-    """Returns the contents of the job queue.
-
-    Returns:
-        [{u'ACTION': 'API action' (e.g. u'linode.create'),
-          u'DURATION': Duration spent processing or '',
-          u'ENTERED_DT': 'yyyy-mm-dd hh:mm:ss.0'
-          u'HOST_FINISH_DT': 'yyyy-mm-dd hh:mm:ss.0' or '',
-          u'HOST_MESSAGE': 'response from host'
-          u'HOST_START_DT': 'yyyy-mm-dd hh:mm:ss.0' or '',
-          u'HOST_SUCCESS': 1 or '',
-          u'JOBID': Job ID,
-          u'LABEL': 'Description of job',
-          u'LINODEID': Linode ID}, ...]
-    """
+    """Returns the contents of the job queue."""
     pass
 
-  @__api_request(optional=['isXen'])
+  @__api_request(optional=['isXen'],
+                 returns=[{u'ISXEN': '0 or 1',
+                           u'KERNELID': 'Kernel ID',
+                           u'LABEL': 'kernel version string'}])
   def avail_kernels(self, request):
-    """List available kernels.
-
-    Returns:
-        [{u'ISXEN': 0 or 1,
-          u'KERNELID': Kernel ID,
-          u'LABEL': 'kernel version string'}, ...]
-    """
+    """List available kernels."""
     pass
 
   @__api_request(returns=[{u'CREATE_DT': 'YYYY-MM-DD hh:mm:ss.0',
