@@ -211,7 +211,7 @@ class Api:
     else:
       return s
 
-  def __api_request(required=[], optional=[]):
+  def __api_request(required=[], optional=[], returns=[]):
     """Decorator to define required and optional paramters"""
     for k in required:
       k = k.lower()
@@ -261,6 +261,21 @@ class Api:
         wrapper.__doc__ += '\n    Keyword arguments (* = required):\n'
         wrapper.__doc__ += ''.join(['\t*%s\n' % p for p in required])
         wrapper.__doc__ += ''.join(['\t %s\n' % p for p in optional])
+
+      if returns and wrapper.__doc__:
+        # we either have a list of dicts or a just plain dict
+        if len(wrapper.__doc__.split('\n')) is 1:  # one-liners need whitespace
+          wrapper.__doc__ += '\n' 
+        if isinstance(returns, list):
+          wrapper.__doc__ += '\n    Returns list of dictionaries:\n\t[{\n'
+          wrapper.__doc__ += ''.join(['\t  %s:\t%s\n'
+                              % (p, returns[0][p]) for p in returns[0].keys()])
+          wrapper.__doc__ += '\t}, ...]\n'
+        else:
+          wrapper.__doc__ += '\n    Returns dictionary:\n\t{\n'
+          wrapper.__doc__ += ''.join(['\t %s:\t%s\n'
+                              % (p, returns[p]) for p in returns.keys()])
+          wrapper.__doc__ += '\t}\n'
 
       return wrapper
     return decorator
@@ -546,58 +561,41 @@ class Api:
     """
     pass
 
-  @__api_request()
+  @__api_request(returns=[{u'CREATE_DT': 'YYYY-MM-DD hh:mm:ss.0',
+                           u'DISTRIBUTIONID': 'Distribution ID',
+                           u'IS64BIT': '0 or 1',
+                           u'LABEL': 'Description of image',
+                           u'MINIMAGESIZE': 'MB required to deploy image'}])
   def avail_distributions(self, request):
-    """Returns a list of available Linux Distributions.
-
-    Returns:
-        [{u'CREATE_DT': 'YYYY-MM-DD hh:mm:ss.0',
-          u'DISTRIBUTIONID': Distribution ID,
-          u'IS64BIT': 0 or 1,
-          u'LABEL': 'Description of image',
-          u'MINIMAGESIZE': MB required to deploy image}, ...]
-    """
+    """Returns a list of available Linux Distributions."""
     pass
 
-  @__api_request()
+  @__api_request(returns=[{u'DATACENTERID': 'Datacenter ID',
+                           u'LOCATION': 'City, ST, USA'}])
   def avail_datacenters(self, request):
-    """Returns a list of Linode data center facilities.
-
-    Returns:
-        [{u'DATACENTERID': Datacenter ID,
-          u'LOCATION': 'City, ST, USA'}, ...]
-    """
+    """Returns a list of Linode data center facilities."""
     pass
 
-  @__api_request()
+  @__api_request(returns=[{u'DISK': 'Maximum disk allocation (GB)',
+                           u'LABEL': 'Name of plan', u'PLANID': 'Plan ID',
+                           u'PRICE': 'Price (US dollars)',
+                           u'RAM': 'Maximum memory (MB)',
+                           u'XFER': 'Allowed transfer (GB/mo)',
+                           u'AVAIL': {u'Datacenter ID': 'Quantity'}}])
   def avail_linodeplans(self, request):
     """Returns a structure of Linode PlanIDs containing PlanIDs, and their
     availability in each datacenter.
-
-    Returns:
-        [{u'DISK': Maximum disk allocation (GB),
-          u'LABEL': 'Name of plan',
-          u'PLANID': Plan ID,
-          u'PRICE': Price (US dollars),
-          u'RAM': Maximum memory (MB),
-          u'XFER': Allowed transfer (GB/mo),
-          u'AVAIL': {
-             u'Datacenter ID': Quantity, ...}
-         }, ...]
     """
     pass
 
-  @__api_request(required=['username', 'password'])
+  @__api_request(required=['username', 'password'],
+                 returns={u'API_KEY': 'API key', u'USERNAME': 'Username'})
   def user_getapikey(self, request):
     """Given a username and password, returns the user's API key.  The
     key is remembered by this instance for future use.
 
     Please be advised that this will replace any previous key stored
     by the instance.
-
-    Returns:
-        {u'API_KEY': API key string,
-         u'USERNAME': Username}
     """
     pass
 
