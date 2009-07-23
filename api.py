@@ -259,23 +259,25 @@ class Api:
         if len(wrapper.__doc__.split('\n')) is 1:  # one-liners need whitespace
           wrapper.__doc__ += '\n'
         wrapper.__doc__ += '\n    Keyword arguments (* = required):\n'
-        wrapper.__doc__ += ''.join(['\t*%s\n' % p for p in required])
-        wrapper.__doc__ += ''.join(['\t %s\n' % p for p in optional])
+        wrapper.__doc__ += ''.join(['\t *%s\n' % p for p in required])
+        wrapper.__doc__ += ''.join(['\t  %s\n' % p for p in optional])
 
       if returns and wrapper.__doc__:
         # we either have a list of dicts or a just plain dict
         if len(wrapper.__doc__.split('\n')) is 1:  # one-liners need whitespace
           wrapper.__doc__ += '\n' 
         if isinstance(returns, list):
+          width = max(len(q) for q in returns[0].keys())
           wrapper.__doc__ += '\n    Returns list of dictionaries:\n\t[{\n'
-          wrapper.__doc__ += ''.join(['\t  %s:\t%s\n'
-                              % (p, returns[0][p]) for p in returns[0].keys()])
+          wrapper.__doc__ += ''.join(['\t  %-*s: %s\n'
+                              % (width, p, returns[0][p]) for p in returns[0].keys()])
           wrapper.__doc__ += '\t }, ...]\n'
         else:
-          wrapper.__doc__ += '\n    Returns dictionary:\n\t{\n'
-          wrapper.__doc__ += ''.join(['\t %s:\t%s\n'
-                              % (p, returns[p]) for p in returns.keys()])
-          wrapper.__doc__ += '\t}\n'
+          width = max(len(q) for q in returns.keys())
+          wrapper.__doc__ += '\n    Returns dictionary:\n\t {\n'
+          wrapper.__doc__ += ''.join(['\t  %-*s: %s\n'
+                              % (width, p, returns[p]) for p in returns.keys()])
+          wrapper.__doc__ += '\t }\n'
 
       return wrapper
     return decorator
@@ -414,8 +416,9 @@ class Api:
   @__api_request(required=['LinodeID', 'ConfigID'],
                  returns={u'ConfigID': 'Config ID'})
   def linode_config_delete(self, request):
-    """Deletes a configuration profile.  This does not delete the Linode
-    itself, nor its disk images (see linode_disk_delete, linode_delete).
+    """Deletes a configuration profile.  This does not delete the
+    Linode itself, nor its disk images (see linode_disk_delete,
+    linode_delete).
     """
     pass
   
@@ -446,8 +449,8 @@ class Api:
   def linode_disk_create(self, request):
     """Submits a job to create a new disk image.
 
-    On job submission, returns the disk ID and job ID.  Does not wait for
-    job completion (see linode_job_list).
+    On job submission, returns the disk ID and job ID.  Does not
+    wait for job completion (see linode_job_list).
     """
     pass
 
@@ -456,8 +459,8 @@ class Api:
   def linode_disk_duplicate(self, request):
     """Submits a job to preform a bit-for-bit copy of a disk image.
 
-    On job submission, returns the disk ID and job ID.  Does not wait for
-    job completion (see linode_job_list).
+    On job submission, returns the disk ID and job ID.  Does not
+    wait for job completion (see linode_job_list).
     """
     pass
 
@@ -468,8 +471,8 @@ class Api:
 
     WARNING: All data on the disk image will be lost forever.
 
-    On job submission, returns the disk ID and job ID.  Does not wait for
-    job completion (see linode_job_list).
+    On job submission, returns the disk ID and job ID.  Does not
+    wait for job completion (see linode_job_list).
     """
     pass
 
@@ -478,8 +481,8 @@ class Api:
   def linode_disk_resize(self, request):
     """Submits a job to resize a partition.
 
-    On job submission, returns the disk ID and job ID.  Does not wait for
-    job completion (see linode_job_list).
+    On job submission, returns the disk ID and job ID.  Does not
+    wait for job completion (see linode_job_list).
     """
     pass
 
@@ -490,8 +493,8 @@ class Api:
   def linode_disk_createfromdistribution(self, request):
     """Submits a job to create a disk image from a Linode template.
 
-    On job submission, returns the disk ID and job ID.  Does not wait for
-    job completion (see linode_job_list).
+    On job submission, returns the disk ID and job ID.  Does not
+    wait for job completion (see linode_job_list).
     """
     pass
 
@@ -550,8 +553,8 @@ class Api:
                            u'XFER': 'Allowed transfer (GB/mo)',
                            u'AVAIL': {u'Datacenter ID': 'Quantity'}}])
   def avail_linodeplans(self, request):
-    """Returns a structure of Linode PlanIDs containing PlanIDs, and their
-    availability in each datacenter.
+    """Returns a structure of Linode PlanIDs containing PlanIDs, and
+    their availability in each datacenter.
     """
     pass
 
