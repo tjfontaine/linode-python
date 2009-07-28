@@ -176,6 +176,20 @@ class Api:
     request = { 'api_action' : 'batch', 'requestArray' : s }
     return self.__send_request(request)
 
+  def __getattr__(self, name):
+    """Return a callable for any undefined attribute and assume it's an API call"""
+    def generic_request(*args, **kw):
+      request = LowerCaseDict(kw)
+      request['api_action'] = name.replace('_', '.')
+
+      if self.batching:
+        self.__batch_cache.append(request)
+        logging.dbeug('Batched: %s', json.dumps(request))
+      else:
+        return self.__send_request(request)
+    generic_request.__name__ = name
+    return generic_request
+
   def __send_request(self, request):
     if self.__key:
       request['api_key'] = self.__key
