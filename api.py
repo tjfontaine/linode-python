@@ -173,7 +173,7 @@ class Api:
 
     s = json.dumps(self.__batch_cache)
     self.__batch_cache = []
-    request = { 'api_action' : 'batch', 'requestArray' : s }
+    request = { 'api_action' : 'batch', 'api_requestArray' : s }
     return self.__send_request(request)
 
   def __getattr__(self, name):
