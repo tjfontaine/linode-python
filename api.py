@@ -70,6 +70,7 @@ class ApiError(Exception):
     30: Charging the credit card failed
     31: Credit card is expired
     40: Limit of Linodes added per hour reached
+    41: Linode must have no disks before delete
   """
   
   def __init__(self, value):
@@ -344,7 +345,7 @@ class Api:
   def linode_create(self, request):
     """Create a new Linode.
 
-    WARNING: This will create a billing event.
+    This will create a billing event.
     """
     pass
 
@@ -371,8 +372,12 @@ class Api:
                  returns={u'LinodeID': 'Destroyed Linode ID'})
   def linode_delete(self, request):
     """Completely, immediately, and totally deletes a Linode.
+    Requires all disk images be deleted first, for safety.
 
-    WARNING: This will permenantly delete a Linode, running or no.
+    This will create a billing event.
+
+    WARNING: Deleting your last Linode may disable services that
+    require a paid account (e.g. DNS hosting).
     """
     pass
 
