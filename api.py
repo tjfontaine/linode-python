@@ -608,20 +608,19 @@ class Api:
   def domain_delete(self, request):
     pass
 
-  @__api_request(required=[
-                  'Domain',
-                  'Type',
-                  'SOA_Email'
-                 ],
-                 optional=[
-                  'Refresh_sec',
-                  'Retry_sec',
-                  'Expire_sec',
-                  'TTL_sec',
-                  'status',
-                  'master_ips',
-                ])
+  @__api_request(required=['Domain', 'Type'],
+                 optional=['SOA_Email', 'Refresh_sec', 'Retry_sec',
+                           'Expire_sec', 'TTL_sec', 'status', 'master_ips'],
+                 returns={u'DomainID': 'Domain ID number'})
   def domain_create(self, request):
+    """Create a new domain.
+
+    For type='master', SOA_Email is required.
+    For type='slave', Master_IPs is required.
+
+    Master_IPs is a comma or semicolon-delimited list of master IPs.
+    Status is 1 (Active), 2 (EditMode), or 3 (Off).
+    """
     pass
 
   @__api_request(required=['DomainID'], optional=[
