@@ -70,6 +70,7 @@ class ApiError(Exception):
     30: Charging the credit card failed
     31: Credit card is expired
     40: Limit of Linodes added per hour reached
+    41: Linode must have no disks before delete
   """
   
   def __init__(self, value):
@@ -344,7 +345,7 @@ class Api:
   def linode_create(self, request):
     """Create a new Linode.
 
-    WARNING: This will create a billing event.
+    This will create a billing event.
     """
     pass
 
@@ -371,8 +372,12 @@ class Api:
                  returns={u'LinodeID': 'Destroyed Linode ID'})
   def linode_delete(self, request):
     """Completely, immediately, and totally deletes a Linode.
+    Requires all disk images be deleted first, for safety.
 
-    WARNING: This will permenantly delete a Linode, running or no.
+    This will create a billing event.
+
+    WARNING: Deleting your last Linode may disable services that
+    require a paid account (e.g. DNS hosting).
     """
     pass
 
@@ -583,42 +588,50 @@ class Api:
     """
     pass
 
-  @__api_request(optional=['DomainID'])
+  @__api_request(optional=['DomainID'],
+                 returns=[{u'STATUS': 'Status flag',
+                           u'RETRY_SEC': 'SOA Retry field',
+                           u'DOMAIN': 'Domain name',
+                           u'DOMAINID': 'Domain ID number',
+                           u'DESCRIPTION': 'Description',
+                           u'MASTER_IPS': 'Master nameservers (for slave zones)',
+                           u'SOA_EMAIL': 'SOA e-mail address (user@domain)',
+                           u'REFRESH_SEC': 'SOA Refresh field',
+                           u'TYPE': 'Type of zone (master or slave)',
+                           u'EXPIRE_SEC': 'SOA Expire field',
+                           u'TTL_SEC': 'Default TTL'}])
   def domain_list(self, request):
+    """Returns a list of domains associated with this account."""
     pass
 
-  @__api_request(required=['DomainID'])
+  @__api_request(required=['DomainID'],
+                 returns={u'DomainID': 'Domain ID number'})
   def domain_delete(self, request):
+    """Deletes a given domain, by domainid."""
     pass
 
-  @__api_request(required=[
-                  'Domain',
-                  'Type',
-                  'SOA_Email'
-                 ],
-                 optional=[
-                  'Refresh_sec',
-                  'Retry_sec',
-                  'Expire_sec',
-                  'TTL_sec',
-                  'status',
-                  'master_ips',
-                ])
+  @__api_request(required=['Domain', 'Type'],
+                 optional=['SOA_Email', 'Refresh_sec', 'Retry_sec',
+                           'Expire_sec', 'TTL_sec', 'status', 'master_ips'],
+                 returns={u'DomainID': 'Domain ID number'})
   def domain_create(self, request):
+    """Create a new domain.
+
+    For type='master', SOA_Email is required.
+    For type='slave', Master_IPs is required.
+
+    Master_IPs is a comma or semicolon-delimited list of master IPs.
+    Status is 1 (Active), 2 (EditMode), or 3 (Off).
+    """
     pass
 
-  @__api_request(required=['DomainID'], optional=[
-                                                  'Domain',
-                                                  'Type',
-                                                  'SOA_Email',
-                                                  'Refresh_sec',
-                                                  'Retry_sec',
-                                                  'Expire_sec',
-                                                  'TTL_sec',
-                                                  'status',
-                                                  'master_ips',
-                                                 ])
+  @__api_request(required=['DomainID'],
+                 optional=['Domain', 'Type', 'SOA_Email', 'Refresh_sec',
+                           'Retry_sec', 'Expire_sec', 'TTL_sec', 'status',
+                           'master_ips'],
+                 returns={u'DomainID': 'Domain ID number'})
   def domain_update(self, request):
+    """Updates the parameters of a given domain."""
     pass
 
   @__api_request(required=['DomainID'], optional=['ResourceID'])
