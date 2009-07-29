@@ -625,18 +625,13 @@ class Api:
     """
     pass
 
-  @__api_request(required=['DomainID'], optional=[
-                                                  'Domain',
-                                                  'Type',
-                                                  'SOA_Email',
-                                                  'Refresh_sec',
-                                                  'Retry_sec',
-                                                  'Expire_sec',
-                                                  'TTL_sec',
-                                                  'status',
-                                                  'master_ips',
-                                                 ])
+  @__api_request(required=['DomainID'],
+                 optional=['Domain', 'Type', 'SOA_Email', 'Refresh_sec',
+                           'Retry_sec', 'Expire_sec', 'TTL_sec', 'status',
+                           'master_ips'],
+                 returns={u'DomainID': 'Domain ID number'})
   def domain_update(self, request):
+    """Updates the parameters of a given domain."""
     pass
 
   @__api_request(required=['DomainID'], optional=['ResourceID'])
