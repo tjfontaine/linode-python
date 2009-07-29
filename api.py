@@ -588,8 +588,20 @@ class Api:
     """
     pass
 
-  @__api_request(optional=['DomainID'])
+  @__api_request(optional=['DomainID'],
+                 returns=[{u'STATUS': 'Status flag',
+                           u'RETRY_SEC': 'SOA Retry field',
+                           u'DOMAIN': 'Domain name',
+                           u'DOMAINID': 'Domain ID number',
+                           u'DESCRIPTION': 'Description',
+                           u'MASTER_IPS': 'Master nameservers (for slave zones)',
+                           u'SOA_EMAIL': 'SOA e-mail address (user@domain)',
+                           u'REFRESH_SEC': 'SOA Refresh field',
+                           u'TYPE': 'Type of zone (master or slave)',
+                           u'EXPIRE_SEC': 'SOA Expire field',
+                           u'TTL_SEC': 'Default TTL'}])
   def domain_list(self, request):
+    """Returns a list of domains associated with this account."""
     pass
 
   @__api_request(required=['DomainID'])
