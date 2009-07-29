@@ -318,6 +318,56 @@ class LinodeIP(LinodeObject):
 
   list_method = _api.linode_ip_list
 
+class Domain(LinodeObject):
+  fields = {
+    'id'        : IntField('DomainID'),
+    'domain'    : CharField('Domain'),
+    'type'      : ChoiceField('Type', choices=['master', 'slave']),
+    'soa_email' : CharField('SOA_Email'),
+    'refresh'   : IntField('Refresh_sec'),
+    'retry'     : IntField('Retry_sec'),
+    'expire'    : IntField('Expire_sec'),
+    'ttl'       : IntField('TTL_sec'),
+    'status'    : ChoiceField('Status', choices=[1, 2, 3]),
+    'master_ips': ListField('master_ips', type=CharField('master_ips')),
+  }
+
+  update_method = _api.domain_update
+  create_method = _api.domain_create
+  primary_key   = 'DomainID'
+  list_method   = _api.domain_list
+
+  STATUS_ON   = 1
+  STATUS_EDIT = 2
+  STATUS_OFF  = 3
+
+  def delete(self):
+    self.cache_remove()
+    _api.domain_delete(domainid=self.id)
+
+class Resource(LinodeObject):
+  fields = {
+    'id'        : IntField('ResourceID'),
+    'domain'    : ForeignField(Domain),
+    'name'      : CharField('Name'),
+    'type'      : CharField('Type'),
+    'target'    : CharField('Target'),
+    'priority'  : IntField('Priority'),
+    'weight'    : IntField('Weight'),
+    'port'      : IntField('Port'),
+    'protocol'  : CharField('Protocol'),
+    'ttl'       : IntField('TTL_sec'),
+  }
+
+  update_method = _api.domain_resource_update
+  create_method = _api.domain_resource_create
+  primary_key   = 'ResourceID'
+  list_method   = _api.domain_resource_list
+
+  def delete(self):
+    self.cache_remove()
+    _api.domain_resource_delete(domainid=self.domain.id, resourceid=self.id)
+
 def _iter_class(self, results):
   _id_cache[self] = {}
   results = LowerCaseDict(results)
@@ -332,14 +382,18 @@ def fill_cache():
   _api.avail_datacenters()
   _api.avail_distributions()
   _api.avail_kernels()
+  _api.domain_list()
   ret = _api.batchFlush()
 
-  for i,k in enumerate([Linode, LinodePlan, Datacenter, Distribution, Kernel]):
+  for i,k in enumerate([Linode, LinodePlan, Datacenter, Distribution, Kernel, Domain]):
     _iter_class(k, ret[i])
 
   for k in _id_cache[Linode].keys():
     _api.linode_config_list(linodeid=k)
     _api.linode_disk_list(linodeid=k)
+
+  for k in _id_cache[Domain].keys():
+    _api.domain_resource_list(domainid=k)
 
   ret = _api.batchFlush()
 
@@ -349,6 +403,8 @@ def fill_cache():
       _iter_class(LinodeConfig, r)
     elif r['action'] == 'linode.disk.list':
       _iter_class(LinodeDisk, r)
+    elif r['action'] == 'domain.resource.list':
+      _iter_class(Resource, r)
 
   _api.batching = False
 

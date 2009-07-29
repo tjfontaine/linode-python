@@ -583,7 +583,7 @@ class Api:
     """
     pass
 
-  @__api_request()
+  @__api_request(optional=['DomainID'])
   def domain_list(self, request):
     pass
 
@@ -591,14 +591,19 @@ class Api:
   def domain_delete(self, request):
     pass
 
-  @__api_request(required=['Domain','Type','SOA_Email'], optional=[
-                                                                  'Refresh_sec',
-                                                                  'Retry_sec',
-                                                                  'Expire_sec',
-                                                                  'TTL_sec',
-                                                                  'status',
-                                                                  'master_ips',
-                                                                ])
+  @__api_request(required=[
+                  'Domain',
+                  'Type',
+                  'SOA_Email'
+                 ],
+                 optional=[
+                  'Refresh_sec',
+                  'Retry_sec',
+                  'Expire_sec',
+                  'TTL_sec',
+                  'status',
+                  'master_ips',
+                ])
   def domain_create(self, request):
     pass
 
@@ -616,6 +621,42 @@ class Api:
   def domain_update(self, request):
     pass
 
-  @__api_request(required=['DomainID'], optional=['DomainResourceID'])
+  @__api_request(required=['DomainID'], optional=['ResourceID'])
   def domain_resource_list(self, request):
+    pass
+
+  @__api_request(required=[
+                  'DomainID',
+                  'Type',
+                 ],
+                 optional=[
+                  'Name',
+                  'Target',
+                  'Priority',
+                  'Weight',
+                  'Port',
+                  'Protocol',
+                  'TTL_Sec',
+                 ])
+  def domain_resource_create(self, request):
+    pass
+
+  @__api_request(required=['DomainID', 'ResourceID'])
+  def domain_resource_delete(self, request):
+    pass
+
+  @__api_request(required=[
+                  'DomainID',
+                  'ResourceID'
+                 ],
+                 optional=[
+                  'Name',
+                  'Target',
+                  'Priority',
+                  'Weight',
+                  'Port',
+                  'Protocol',
+                  'TTL_Sec',
+                 ])
+  def domain_resource_update(self, request):
     pass
