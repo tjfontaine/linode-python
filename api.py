@@ -604,8 +604,10 @@ class Api:
     """Returns a list of domains associated with this account."""
     pass
 
-  @__api_request(required=['DomainID'])
+  @__api_request(required=['DomainID'],
+                 returns={u'DomainID': 'Domain ID number'})
   def domain_delete(self, request):
+    """Deletes a given domain, by domainid."""
     pass
 
   @__api_request(required=['Domain', 'Type'],
