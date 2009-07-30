@@ -622,6 +622,10 @@ class Api:
 
     Master_IPs is a comma or semicolon-delimited list of master IPs.
     Status is 1 (Active), 2 (EditMode), or 3 (Off).
+
+    TTL values are rounded up to the nearest valid value:
+    300, 3600, 7200, 14440, 28800, 57600, 86400, 172800,
+    345600, 604800, 1209600, or 2419200 seconds.
     """
     pass
 
@@ -631,45 +635,57 @@ class Api:
                            'master_ips'],
                  returns={u'DomainID': 'Domain ID number'})
   def domain_update(self, request):
-    """Updates the parameters of a given domain."""
+    """Updates the parameters of a given domain.
+
+    TTL values are rounded up to the nearest valid value:
+    300, 3600, 7200, 14440, 28800, 57600, 86400, 172800,
+    345600, 604800, 1209600, or 2419200 seconds.
+    """
     pass
 
-  @__api_request(required=['DomainID'], optional=['ResourceID'])
+  @__api_request(required=['DomainID'], optional=['ResourceID'],
+                 returns=[{u'DOMAINID': 'Domain ID number',
+                           u'PROTOCOL': 'Protocol (for SRV)',
+                           u'TTL_SEC': 'TTL for record (0=default)',
+                           u'WEIGHT': 'Weight (for SRV)',
+                           u'NAME': 'The hostname or FQDN',
+                           u'RESOURCEID': 'Resource ID number',
+                           u'PRIORITY': 'Priority (for MX, SRV)',
+                           u'TYPE': 'Resource Type (A, MX, etc)',
+                           u'PORT': 'Port (for SRV)',
+                           u'TARGET': 'The "right hand side" of the record'}])
   def domain_resource_list(self, request):
+    """List the resources associated with a given DomainID."""
     pass
 
-  @__api_request(required=[
-                  'DomainID',
-                  'Type',
-                 ],
-                 optional=[
-                  'Name',
-                  'Target',
-                  'Priority',
-                  'Weight',
-                  'Port',
-                  'Protocol',
-                  'TTL_Sec',
-                 ])
+  @__api_request(required=['DomainID', 'Type'],
+                 optional=['Name', 'Target', 'Priority', 'Weight',
+                           'Port', 'Protocol', 'TTL_Sec'],
+                 returns={u'ResourceID': 'Resource ID number'})
   def domain_resource_create(self, request):
+    """Creates a resource within a given DomainID.
+
+    TTL values are rounded up to the nearest valid value:
+    300, 3600, 7200, 14440, 28800, 57600, 86400, 172800,
+    345600, 604800, 1209600, or 2419200 seconds.
+    """
     pass
 
-  @__api_request(required=['DomainID', 'ResourceID'])
+  @__api_request(required=['DomainID', 'ResourceID'],
+                 returns={u'ResourceID': 'Resource ID number'})
   def domain_resource_delete(self, request):
+    """Deletes a Resource from a Domain."""
     pass
 
-  @__api_request(required=[
-                  'DomainID',
-                  'ResourceID'
-                 ],
-                 optional=[
-                  'Name',
-                  'Target',
-                  'Priority',
-                  'Weight',
-                  'Port',
-                  'Protocol',
-                  'TTL_Sec',
-                 ])
+  @__api_request(required=['DomainID', 'ResourceID'],
+                 optional=['Name', 'Target', 'Priority', 'Weight', 'Port',
+                           'Protocol', 'TTL_Sec'],
+                 returns={u'ResourceID': 'Resource ID number'})
   def domain_resource_update(self, request):
+    """Updates a domain resource.
+
+    TTL values are rounded up to the nearest valid value:
+    300, 3600, 7200, 14440, 28800, 57600, 86400, 172800,
+    345600, 604800, 1209600, or 2419200 seconds.
+    """
     pass
