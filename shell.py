@@ -72,20 +72,19 @@ if __name__ == "__main__":
   else:
     key = getpass('Enter API Key: ')
 
-  try:
-    import highlevel
-    linode = highlevel.HighLevel(key)
-  except:
-    linode = api.Api(key)
+  linode = api.Api(key)
 
-  def usage():
+  def usage(all=False):
     print 'shell.py --<api action> [--parameter1=value [--parameter2=value [...]]]'
     print 'Valid Actions'
     for a in sorted(linode.valid_commands()):
       print '\t--'+a
-    print 'Valid Named Parameters'
-    for a in sorted(linode.valid_params()):
-      print '\t--'+a+'='
+    if all:
+      print 'Valid Named Parameters'
+      for a in sorted(linode.valid_params()):
+        print '\t--'+a+'='
+    else:
+      print 'To see valid parameters use: --help --all'
 
   options = []
   for arg in linode.valid_params():
@@ -94,6 +93,7 @@ if __name__ == "__main__":
   for arg in linode.valid_commands():
     options.append(arg)
   options.append('help')
+  options.append('all')
 
   if len(sys.argv[1:]) > 0:
     try:
@@ -105,15 +105,16 @@ if __name__ == "__main__":
 
     command = optlist[0][0].replace('--', '')
 
+    params = {}
+    for param,value in optlist[1:]:
+      params[param.replace('--', '')] = value
+
+    if command == 'help' or params.has_key('help'):
+      usage(params.has_key('all'))
+      sys.exit(2)
+
     if hasattr(linode, command):
       func = getattr(linode, command)
-      params = {}
-      for param,value in optlist[1:]:
-        if param.replace('--', '') == 'help':
-          usage()
-          sys.exit(2)
-
-        params[param.replace('--', '')] = value
       try:
         print json.dumps(func(**params), indent=2)
       except api.MissingRequiredArgument, mra:
