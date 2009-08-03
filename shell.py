@@ -118,13 +118,13 @@ if __name__ == "__main__":
       try:
         print json.dumps(func(**params), indent=2)
       except api.MissingRequiredArgument, mra:
-        print 'Missing option --'+mra.value
+        print 'Missing option --'+mra.value.lower()
         print ''
         usage()
         sys.exit(2)
     else:
       if not command == 'help':
-        print 'Invalid action '+optlist[0][0]
+        print 'Invalid action '+optlist[0][0].lower()
 
       usage()
       sys.exit(2)
