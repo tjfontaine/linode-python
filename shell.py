@@ -118,7 +118,7 @@ if __name__ == "__main__":
       try:
         print json.dumps(func(**params), indent=2)
       except api.MissingRequiredArgument, mra:
-        print 'Missing option --'+mra.value
+        print 'Missing option -- %s' % mra.value.lower()
         print ''
         usage()
         sys.exit(2)
