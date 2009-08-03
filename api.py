@@ -82,7 +82,7 @@ class ApiInfo:
   valid_commands = {}
   valid_params   = {}
 
-LINODE_API_URL = 'https://beta.linode.com/api/'
+LINODE_API_URL = 'https://api.linode.com/api/'
 
 class LowerCaseDict(dict):
   def __init__(self, copy=None):
