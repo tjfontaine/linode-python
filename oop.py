@@ -322,6 +322,7 @@ class Domain(LinodeObject):
   fields = {
     'id'        : IntField('DomainID'),
     'domain'    : CharField('Domain'),
+    'name'      : CharField('Domain'),
     'type'      : ChoiceField('Type', choices=['master', 'slave']),
     'soa_email' : CharField('SOA_Email'),
     'refresh'   : IntField('Refresh_sec'),
