@@ -187,7 +187,7 @@ class Api:
 
       if self.batching:
         self.__batch_cache.append(request)
-        logging.dbeug('Batched: %s', json.dumps(request))
+        logging.debug('Batched: %s', json.dumps(request))
       else:
         return self.__send_request(request)
     generic_request.__name__ = name
