@@ -84,6 +84,8 @@ class ApiInfo:
 
 LINODE_API_URL = 'https://api.linode.com/api/'
 
+VERSION = '0.0.1'
+
 class LowerCaseDict(dict):
   def __init__(self, copy=None):
     if copy:
@@ -202,7 +204,11 @@ class Api:
     logging.debug('Parmaters '+str(request))
     request = urllib.urlencode(request)
 
-    req = self.__request(LINODE_API_URL, request)
+    headers = {
+      'User-Agent': 'LinodePython/'+VERSION,
+    }
+
+    req = self.__request(LINODE_API_URL, request, headers)
     response = self.__urlopen(req)
     response = response.read()
 
