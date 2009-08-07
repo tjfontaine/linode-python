@@ -317,6 +317,7 @@ class LinodeIP(LinodeObject):
   }
 
   list_method = _api.linode_ip_list
+  primary_key = 'IPAddressID'
 
 class Domain(LinodeObject):
   fields = {
