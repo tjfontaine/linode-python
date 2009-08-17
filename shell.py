@@ -124,7 +124,7 @@ if __name__ == "__main__":
         sys.exit(2)
     else:
       if not command == 'help':
-        print 'Invalid action '+optlist[0][0]
+        print 'Invalid action '+optlist[0][0].lower()
 
       usage()
       sys.exit(2)

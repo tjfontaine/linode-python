@@ -374,11 +374,12 @@ class Api:
     """
     pass
 
-  @__api_request(required=['LinodeID'],
+  @__api_request(required=['LinodeID'], optional=['skipChecks'],
                  returns={u'LinodeID': 'Destroyed Linode ID'})
   def linode_delete(self, request):
     """Completely, immediately, and totally deletes a Linode.
-    Requires all disk images be deleted first, for safety.
+    Requires all disk images be deleted first, or that the optional
+    skipChecks parameter be set.
 
     This will create a billing event.
 
