@@ -631,7 +631,7 @@ class Api:
     Status is 1 (Active), 2 (EditMode), or 3 (Off).
 
     TTL values are rounded up to the nearest valid value:
-    300, 3600, 7200, 14440, 28800, 57600, 86400, 172800,
+    300, 3600, 7200, 14400, 28800, 57600, 86400, 172800,
     345600, 604800, 1209600, or 2419200 seconds.
     """
     pass
@@ -645,7 +645,7 @@ class Api:
     """Updates the parameters of a given domain.
 
     TTL values are rounded up to the nearest valid value:
-    300, 3600, 7200, 14440, 28800, 57600, 86400, 172800,
+    300, 3600, 7200, 14400, 28800, 57600, 86400, 172800,
     345600, 604800, 1209600, or 2419200 seconds.
     """
     pass
@@ -673,7 +673,7 @@ class Api:
     """Creates a resource within a given DomainID.
 
     TTL values are rounded up to the nearest valid value:
-    300, 3600, 7200, 14440, 28800, 57600, 86400, 172800,
+    300, 3600, 7200, 14400, 28800, 57600, 86400, 172800,
     345600, 604800, 1209600, or 2419200 seconds.
     """
     pass
@@ -692,7 +692,7 @@ class Api:
     """Updates a domain resource.
 
     TTL values are rounded up to the nearest valid value:
-    300, 3600, 7200, 14440, 28800, 57600, 86400, 172800,
+    300, 3600, 7200, 14400, 28800, 57600, 86400, 172800,
     345600, 604800, 1209600, or 2419200 seconds.
     """
     pass
