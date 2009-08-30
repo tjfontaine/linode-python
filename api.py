@@ -675,6 +675,10 @@ class Api:
     TTL values are rounded up to the nearest valid value:
     300, 3600, 7200, 14400, 28800, 57600, 86400, 172800,
     345600, 604800, 1209600, or 2419200 seconds.
+
+    For A and AAAA records, specify Target as "[remote_addr]" to
+    use the source IP address of the request as the target, e.g.
+    for updating pointers to dynamic IP addresses.
     """
     pass
 
@@ -694,5 +698,9 @@ class Api:
     TTL values are rounded up to the nearest valid value:
     300, 3600, 7200, 14400, 28800, 57600, 86400, 172800,
     345600, 604800, 1209600, or 2419200 seconds.
+
+    For A and AAAA records, specify Target as "[remote_addr]" to
+    use the source IP address of the request as the target, e.g.
+    for updating pointers to dynamic IP addresses.
     """
     pass
