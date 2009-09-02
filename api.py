@@ -327,7 +327,17 @@ class Api:
                            u'TOTALXFER': 'available bandwidth (GB/month)',
                            u'WATCHDOG': '0 or 1'}])
   def linode_list(self, request):
-    """List information about your Linodes."""
+    """List information about your Linodes.
+
+    Status flag values:
+      -2: Boot Failed (not in use)
+      -1: Being Created
+       0: Brand New
+       1: Running
+       2: Powered Off
+       3: Shutting Down (not in use)
+       4: Saved to Disk (not in use)
+    """
     pass
 
   @__api_request(required=['LinodeID'],
