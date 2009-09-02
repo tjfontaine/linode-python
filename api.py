@@ -398,6 +398,15 @@ class Api:
     """
     pass
 
+  @__api_request(required=['LinodeID', 'PlanID'])
+  def linode_resize(self, request):
+    """Resize a Linode from one plan to another.
+
+    Immediately shuts the Linode down, charges/credits the account, and
+    issues a migration to an appropriate host server.
+    """
+    pass
+
   @__api_request(required=['LinodeID'],
                  returns=[{u'Comments': 'comments field',
                            u'ConfigID': 'Config ID',
