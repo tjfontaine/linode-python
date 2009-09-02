@@ -223,12 +223,12 @@ class Api:
     if isinstance(s, dict):
       s = LowerCaseDict(s)
       if len(s['ERRORARRAY']) > 0:
-        raise ApiError(s['ERRORARRAY'])
-      else:
-        if s['ACTION'] == 'user.getapikey':
-          self.__key = s['DATA']['API_KEY']
-          logging.debug('API key is: '+self.__key)
-        return s['DATA']
+        if s['ERRORARRAY'][0]['ERRORCODE'] is not 0:
+          raise ApiError(s['ERRORARRAY'])
+      if s['ACTION'] == 'user.getapikey':
+        self.__key = s['DATA']['API_KEY']
+        logging.debug('API key is: '+self.__key)
+      return s['DATA']
     else:
       return s
 
