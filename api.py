@@ -82,7 +82,7 @@ class ApiInfo:
   valid_commands = {}
   valid_params   = {}
 
-LINODE_API_URL = 'https://beta.linode.com/api/'
+LINODE_API_URL = 'https://api.linode.com/api/'
 
 VERSION = '0.0.1'
 
