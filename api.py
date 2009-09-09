@@ -223,12 +223,12 @@ class Api:
     if isinstance(s, dict):
       s = LowerCaseDict(s)
       if len(s['ERRORARRAY']) > 0:
-        raise ApiError(s['ERRORARRAY'])
-      else:
-        if s['ACTION'] == 'user.getapikey':
-          self.__key = s['DATA']['API_KEY']
-          logging.debug('API key is: '+self.__key)
-        return s['DATA']
+        if s['ERRORARRAY'][0]['ERRORCODE'] is not 0:
+          raise ApiError(s['ERRORARRAY'])
+      if s['ACTION'] == 'user.getapikey':
+        self.__key = s['DATA']['API_KEY']
+        logging.debug('API key is: '+self.__key)
+      return s['DATA']
     else:
       return s
 
@@ -405,6 +405,15 @@ class Api:
     
     On job submission, returns the job ID.  Does not wait for job
     completion (see linode_job_list).
+    """
+    pass
+
+  @__api_request(required=['LinodeID', 'PlanID'])
+  def linode_resize(self, request):
+    """Resize a Linode from one plan to another.
+
+    Immediately shuts the Linode down, charges/credits the account, and
+    issues a migration to an appropriate host server.
     """
     pass
 
