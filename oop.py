@@ -5,11 +5,9 @@ from os import environ
 from api import Api, LowerCaseDict
 from fields import *
 
-_api = Api('')
-
 _id_cache = {}
 
-apikey = ''
+ActiveContext = None
 
 class LinodeObject(object):
   fields = None
@@ -21,11 +19,10 @@ class LinodeObject(object):
   def __init__(self, entry={}):
     entry = dict([(str(k), v) for k,v in entry.items()])
     self.__entry = LowerCaseDict(entry)
-    self.__api = Api(apikey)
 
   def __getattr__(self, name):
     name = name.replace('_LinodeObject', '')
-    if name in ('__entry', '__api'):
+    if name == '__entry':
       return self.__dict__[name]
     elif not self.fields.has_key(name):
       raise AttributeError
@@ -38,7 +35,7 @@ class LinodeObject(object):
 
   def __setattr__(self, name, value):
     name = name.replace('_LinodeObject', '')
-    if name in ('__entry', '__api'):
+    if name == '__entry':
       object.__setattr__(self, name, value)
     elif not self.fields.has_key(name):
       raise AttributeError
@@ -61,10 +58,10 @@ class LinodeObject(object):
     if self.id:
       self.update()
     else:
-      self.id = self.create_method(self.__api, **self.__entry)[self.primary_key]
+      self.id = self.create_method(ActiveContext, **self.__entry)[self.primary_key]
 
   def update(self):
-    self.update_method(self.__api, **self.__entry)
+    self.update_method(ActiveContext, **self.__entry)
 
   @classmethod
   def __resolve_kwargs(self, kw):
@@ -78,15 +75,12 @@ class LinodeObject(object):
   def list(self, **kw):
     kwargs = self.__resolve_kwargs(kw)
 
+    """
     if not _id_cache.has_key(self):
       _id_cache[self] = {}
+    """
 
-    try:
-      a = self.__api
-    except AttributeError:
-      self.__api = Api(apikey)
-
-    for l in self.list_method(self.__api, **kwargs):
+    for l in self.list_method(ActiveContext, **kwargs):
       l = LowerCaseDict(l)
       o = self(l)
       o.cache_add()
@@ -96,10 +90,13 @@ class LinodeObject(object):
   def get(self, **kw):
     kwargs = self.__resolve_kwargs(kw)
 
+    """
     if not _id_cache.has_key(self):
       _id_cache[self] = {}
+    """
 
     result = None
+    """
     for k,v in _id_cache[self].items():
       found = True
       for i, j in kwargs.items():
@@ -111,14 +108,11 @@ class LinodeObject(object):
       else:
         result = v
         break
+    """
 
-    try:
-      a = self.__api
-    except AttributeError:
-      self.__api = Api(apikey)
 
     if not result:
-      result = LowerCaseDict(self.list_method(self.__api, **kwargs)[0])
+      result = LowerCaseDict(self.list_method(ActiveContext, **kwargs)[0])
       o = self(result)
       o.cache_add()
       return o
@@ -126,14 +120,20 @@ class LinodeObject(object):
       return self(result)
 
   def cache_remove(self):
+    pass
+    """
     del _id_cache[self.__class__][self.__entry[self.primary_key]]
+    """
 
   def cache_add(self):
+    pass
+    """
     key = self.__class__
     if not _id_cache.has_key(key):
       _id_cache[key] = {}
 
     _id_cache[key][self.__entry[self.primary_key]] = self.__entry
+    """
 
 class Datacenter(LinodeObject):
   fields = {
@@ -192,18 +192,18 @@ class Linode(LinodeObject):
 
   def boot(self):
     ### TODO XXX FIXME return LinodeJob
-    return self.__api.linode_boot(linodeid=self.id)['JobID']
+    return ActiveContext.linode_boot(linodeid=self.id)['JobID']
 
   def shutdown(self):
     ### TODO XXX FIXME return LinodeJob
-    return self.__api.linode_shutdown(linodeid=self.id)['JobID']
+    return ActiveContext.linode_shutdown(linodeid=self.id)['JobID']
 
   def reboot(self):
     ### TODO XXX FIXME return LinodeJob
-    return self.__api.linode_reboot(linodeid=self.id)['JobID']
+    return ActiveContext.linode_reboot(linodeid=self.id)['JobID']
 
   def delete(self):
-    self.__api.linode_delete(linodeid=self.id)
+    ActiveContext.linode_delete(linodeid=self.id)
     self.cache_remove()
 
 class LinodeJob(LinodeObject):
@@ -318,7 +318,7 @@ class LinodeConfig(LinodeObject):
 
   def delete(self):
     self.cache_remove()
-    self.__api.linode_config_delete(linodeid=self.linode.id, configid=self.id)
+    ActiveContext.linode_config_delete(linodeid=self.linode.id, configid=self.id)
 
 class LinodeIP(LinodeObject):
   fields = {
@@ -358,7 +358,7 @@ class Domain(LinodeObject):
 
   def delete(self):
     self.cache_remove()
-    self.__api.domain_delete(domainid=self.id)
+    ActiveContext.domain_delete(domainid=self.id)
 
 class Resource(LinodeObject):
   fields = {
