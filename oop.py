@@ -257,17 +257,17 @@ class LinodeDisk(LinodeObject):
   list_method   = Api.linode_disk_list
 
   def duplicate(self):
-    ret = Api.linode_disk_duplicate(linodeid=self.linode.id, diskid=self.id)
+    ret = ActiveContext.linode_disk_duplicate(linodeid=self.linode.id, diskid=self.id)
     disk = LinodeDisk.get(linode=self.linode, id=ret['DiskID'])
     job = LinodeJob(linode=self.linode, id=ret['JobID'])
     return (disk, job)
 
   def resize(self, size):
-    ret = Api.linode_disk_resize(linodeid=self.linode.id, diskid=self.id, size=size)
+    ret = ActiveContext.linode_disk_resize(linodeid=self.linode.id, diskid=self.id, size=size)
     return LinodeJob.get(linode=self.linode, id=ret['JobID'])
 
   def delete(self):
-    ret = Api.linode_disk_delete(linodeid=self.linode.id, diskid=self.id)
+    ret = ActiveContext.linode_disk_delete(linodeid=self.linode.id, diskid=self.id)
     job = LinodeJob.get(linode=self.linode, id=ret['JobID'])
     self.cache_remove()
     return job
@@ -276,7 +276,7 @@ class LinodeDisk(LinodeObject):
   def create_from_distribution(self, linode, distribution, root_pass, label, size, ssh_key=None):
     l = ForeignField(Linode).to_linode(linode)
     d = ForeignField(Distribution).to_linode(distribution)
-    ret = Api.linode_disk_createfromdistribution(linodeid=l, distributionid=d,
+    ret = ActiveContext.linode_disk_createfromdistribution(linodeid=l, distributionid=d,
             rootpass=root_pass, label=label, size=size, rootsshkey=ssh_key)
     disk = self.get(id=ret['DiskID'], linode=linode)
     job = LinodeJob(id=ret['JobID'], linode=linode)
@@ -343,7 +343,7 @@ class Domain(LinodeObject):
     'retry'     : IntField('Retry_sec'),
     'expire'    : IntField('Expire_sec'),
     'ttl'       : IntField('TTL_sec'),
-    'status'    : ChoiceField('Status', choices=[1, 2, 3]),
+    'status'    : ChoiceField('Status', choices=['0', '1', '2']),
     'master_ips': ListField('master_ips', type=CharField('master_ips')),
   }
 
@@ -352,9 +352,9 @@ class Domain(LinodeObject):
   primary_key   = 'DomainID'
   list_method   = Api.domain_list
 
+  STATUS_OFF  = 0
   STATUS_ON   = 1
   STATUS_EDIT = 2
-  STATUS_OFF  = 3
 
   def delete(self):
     self.cache_remove()
@@ -381,7 +381,7 @@ class Resource(LinodeObject):
 
   def delete(self):
     self.cache_remove()
-    Api.domain_resource_delete(domainid=self.domain.id, resourceid=self.id)
+    ActiveContext.domain_resource_delete(domainid=self.domain.id, resourceid=self.id)
 
   @classmethod
   def list_by_type(self, domain, only=None):
