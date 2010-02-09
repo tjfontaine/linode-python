@@ -149,7 +149,7 @@ class Api:
   the API key for a given user.
 
   Full documentation on the API can be found from Linode at:
-        http://beta.linode.com/api/autodoc.cfm
+        http://www.linode.com/api/
   """
 
   def __init__(self, key=None, batching=False):
@@ -603,6 +603,25 @@ class Api:
     """
     pass
 
+  @__api_request(optional=['StackScriptID', 'DistributionID', 'DistributionVendor',
+                            'keywords'],
+                 returns=[{u'CREATE_DT': "'yyyy-mm-dd hh:mm:ss.0'",
+                            u'DEPLOYMENTSACTIVE': 'The number of Scripts that Depend on this Script',
+                            u'REV_DT': "'yyyy-mm-dd hh:mm:ss.0'",
+                            u'DESCRIPTION': 'User defined description of the script',
+                            u'SCRIPT': 'The actual source of the script',
+                            u'ISPUBLIC': '0 or 1',
+                            u'REV_NOTE': 'Comment regarding this revision',
+                            u'LABEL': 'test',
+                            u'LATESTREV': 'The number of the latest revision',
+                            u'DEPLOYMENTSTOTAL': 'Number of times this script has been deployed',
+                            u'STACKSCRIPTID': 'StackScript ID',
+                            u'DISTRIBUTIONIDLIST': 'Comma separated list of distributions this script is available'}])
+  def avail_stackscripts(self, request):
+    """Returns a list of publicly available StackScript.
+    """
+    pass
+
   @__api_request(required=['username', 'password'],
                  returns={u'API_KEY': 'API key', u'USERNAME': 'Username'})
   def user_getapikey(self, request):
@@ -723,3 +742,44 @@ class Api:
     for updating pointers to dynamic IP addresses.
     """
     pass
+
+  @__api_request(optional=['StackScriptID'],
+                 returns=[{u'CREATE_DT': "'yyyy-mm-dd hh:mm:ss.0'",
+                            u'DEPLOYMENTSACTIVE': 'The number of Scripts that Depend on this Script',
+                            u'REV_DT': "'yyyy-mm-dd hh:mm:ss.0'",
+                            u'DESCRIPTION': 'User defined description of the script',
+                            u'SCRIPT': 'The actual source of the script',
+                            u'ISPUBLIC': '0 or 1',
+                            u'REV_NOTE': 'Comment regarding this revision',
+                            u'LABEL': 'test',
+                            u'LATESTREV': 'The number of the latest revision',
+                            u'DEPLOYMENTSTOTAL': 'Number of times this script has been deployed',
+                            u'STACKSCRIPTID': 'StackScript ID',
+                            u'DISTRIBUTIONIDLIST': 'Comma separated list of distributions this script is available'}])
+  def stackscript_list(self, request):
+    """List StackScripts you have created.
+    """
+    pass
+
+  @__api_request(required=['Label', 'DistributionIDList', 'script'],
+                 optional=['Description', 'isPublic', 'rev_note'],
+                 returns={'STACKSCRIPTID' : 'ID of the created StackScript'})
+  def stackscript_create(self, request):
+    """Create a StackScript
+    """
+    pass
+
+  @__api_request(required=['StackScriptID'],
+                 optional=['Label', 'Description', 'DistributionIDList',
+                           'isPublic', 'rev_note', 'script'])
+  def stackscript_update(self, request):
+    """Update an existing StackScript
+    """
+    pass
+
+  @__api_request(required=['StackScriptID'])
+  def stackscript_delete(self, request):
+    """Delete an existing StackScript
+    """
+    pass
+
