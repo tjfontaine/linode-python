@@ -383,6 +383,24 @@ class Resource(LinodeObject):
     self.cache_remove()
     Api.domain_resource_delete(domainid=self.domain.id, resourceid=self.id)
 
+  @classmethod
+  def list_by_type(self, domain, only=None):
+    resources = self.list(domain=domain)
+    r_by_type = {
+      'A'     : [],
+      'CNAME' : [],
+      'MX'    : [],
+      'SRV'   : [],
+      'TXT'   : [],
+    }
+
+    for r in resources: r_by_type[r.type.upper()].append(r)
+
+    if only:
+      return r_by_type[only.upper()]
+    else:
+      return r_by_type
+
 def _iter_class(self, results):
   _id_cache[self] = {}
   results = LowerCaseDict(results)
