@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# vim:ts=2:sw=2:expandtab
 """
 A Python library to perform low-level Linode API functions.
 
