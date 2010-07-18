@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 """
 
 # URL of API documentation
-apidocurl = 'http://beta.linode.com/api/autodoc.cfm'
+apidocurl = 'http://www.linode.com/api/autodoc.cfm'
 
 import api
 import re
