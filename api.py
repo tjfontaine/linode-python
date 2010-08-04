@@ -160,12 +160,12 @@ class Api:
   @staticmethod
   def valid_commands():
     """Returns a list of API commands supported by this class."""
-    return ApiInfo.valid_commands.keys()
+    return list(ApiInfo.valid_commands.keys())
 
   @staticmethod
   def valid_params():
     """Returns a list of all parameters used by methods of this class."""
-    return ApiInfo.valid_params.keys()
+    return list(ApiInfo.valid_params.keys())
 
   def batchFlush(self):
     """Initiates a batch flush.  Raises Exception if not in batching mode."""
