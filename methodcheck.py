@@ -30,7 +30,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 # URL of API documentation
 apidocurl = 'http://www.linode.com/api/autodoc.cfm'
 
-import api
+from . import api
 import re
 import urllib
 
