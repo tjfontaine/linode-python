@@ -215,7 +215,7 @@ class Api:
     try:
       s = json.loads(response)
     except Exception, ex:
-      print response
+      print(response)
       raise ex
 
     if isinstance(s, dict):

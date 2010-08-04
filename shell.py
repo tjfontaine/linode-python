@@ -75,16 +75,16 @@ if __name__ == "__main__":
   linode = api.Api(key)
 
   def usage(all=False):
-    print 'shell.py --<api action> [--parameter1=value [--parameter2=value [...]]]'
-    print 'Valid Actions'
+    print('shell.py --<api action> [--parameter1=value [--parameter2=value [...]]]')
+    print('Valid Actions')
     for a in sorted(linode.valid_commands()):
-      print '\t--'+a
+      print('\t--'+a)
     if all:
-      print 'Valid Named Parameters'
+      print('Valid Named Parameters')
       for a in sorted(linode.valid_params()):
-        print '\t--'+a+'='
+        print('\t--'+a+'=')
     else:
-      print 'To see valid parameters use: --help --all'
+      print('To see valid parameters use: --help --all')
 
   options = []
   for arg in linode.valid_params():
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     try:
       optlist, args = getopt.getopt(sys.argv[1:], '', options)
     except getopt.GetoptError, err:
-      print str(err)
+      print(str(err))
       usage()
       sys.exit(2)
 
@@ -116,15 +116,15 @@ if __name__ == "__main__":
     if hasattr(linode, command):
       func = getattr(linode, command)
       try:
-        print json.dumps(func(**params), indent=2)
+        print(json.dumps(func(**params), indent=2))
       except api.MissingRequiredArgument, mra:
-        print 'Missing option --%s' % mra.value.lower()
-        print ''
+        print('Missing option --%s' % mra.value.lower())
+        print('')
         usage()
         sys.exit(2)
     else:
       if not command == 'help':
-        print 'Invalid action '+optlist[0][0].lower()
+        print('Invalid action '+optlist[0][0].lower())
 
       usage()
       sys.exit(2)
@@ -134,6 +134,6 @@ if __name__ == "__main__":
     console.runcode('import readline,rlcompleter,api,shell,json')
     console.runcode('readline.parse_and_bind("tab: complete")')
     console.runcode('readline.set_completer(shell.LinodeComplete().complete)')
-    console.runcode('def pp(text=None): print json.dumps(text, indent=2)')
+    console.runcode('def pp(text=None): print(json.dumps(text, indent=2))')
     console.locals.update({'linode':linode})
     console.interact()

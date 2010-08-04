@@ -51,8 +51,8 @@ for i in tmpfd.readlines():
 # Cross-check!
 for i in local_methods:
     if i not in remote_methods:
-        print 'REMOTE Missing: ' + i
+        print('REMOTE Missing: ' + i)
 for i in remote_methods:
     if i not in local_methods:
-        print 'LOCAL Missing:  ' + i
+        print('LOCAL Missing:  ' + i)
 
