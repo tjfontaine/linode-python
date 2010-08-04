@@ -208,7 +208,7 @@ class Api:
 
     try:
       s = json.loads(response)
-    except Exception, ex:
+    except Exception as ex:
       print(response)
       raise ex
 
