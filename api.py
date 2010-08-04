@@ -106,9 +106,6 @@ class LowerCaseDict(dict):
   def __contains__(self, key):
     return dict.__contains__(self, key.lower())
 
-  def has_key(self, key):
-    return dict.has_key(self, key.lower())
-
   def get(self, key, def_val=None):
     return dict.get(self, key.lower(), def_val)
 
@@ -237,16 +234,16 @@ class Api:
     """Decorator to define required and optional paramters"""
     for k in required:
       k = k.lower()
-      if not ApiInfo.valid_params.has_key(k):
+      if k not in ApiInfo.valid_params:
         ApiInfo.valid_params[k] = True
 
     for k in optional:
       k = k.lower()
-      if not ApiInfo.valid_params.has_key(k):
+      if k not in ApiInfo.valid_params:
         ApiInfo.valid_params[k] = True
 
     def decorator(func):
-      if not ApiInfo.valid_commands.has_key(func.__name__):
+      if func.__name__ not in ApiInfo.valid_commands:
         ApiInfo.valid_commands[func.__name__] = True
 
       def wrapper(self, **kw):
@@ -256,7 +253,7 @@ class Api:
         params = LowerCaseDict(kw)
 
         for k in required:
-          if not params.has_key(k):
+          if k not in params:
             raise MissingRequiredArgument(k)
 
         for k in params:
