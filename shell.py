@@ -61,11 +61,9 @@ class LinodeComplete(rlcompleter.Completer):
 if __name__ == "__main__":
   from getpass import getpass
   from os import environ
-  import getopt, sys
-  try:
-    import json
-  except:
-    import simplejson as json
+  import getopt
+  import sys
+  import json
 
   if 'LINODE_API_KEY' in environ:
     key = environ['LINODE_API_KEY']

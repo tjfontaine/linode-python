@@ -32,9 +32,9 @@ apidocurl = 'http://www.linode.com/api/autodoc.cfm'
 
 from . import api
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
-tmpfile, httpheaders = urllib.urlretrieve(apidocurl)
+tmpfile, httpheaders = urllib.request.urlretrieve(apidocurl)
 tmpfd = open(tmpfile)
 
 local_methods = api.Api.valid_commands()

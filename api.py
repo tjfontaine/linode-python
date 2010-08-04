@@ -30,14 +30,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import logging
-import urllib
-import urllib2
-
-try:
-  import json
-except:
-  import simplejson as json
-
+import urllib.request, urllib.error, urllib.parse
+import json
 
 class MissingRequiredArgument(Exception):
   """Raised when a required parameter is missing."""
@@ -152,8 +146,8 @@ class Api:
 
   def __init__(self, key=None, batching=False):
     self.__key = key
-    self.__urlopen = urllib2.urlopen
-    self.__request = urllib2.Request
+    self.__urlopen = urllib2.request.urlopen
+    self.__request = urllib2.request.Request
     self.batching = batching
     self.__batch_cache = []
 
@@ -200,7 +194,7 @@ class Api:
     request['api_responseFormat'] = 'json'
 
     logging.debug('Parmaters '+str(request))
-    request = urllib.urlencode(request)
+    request = urllib.parse.urlencode(request)
 
     headers = {
       'User-Agent': 'LinodePython/'+VERSION,
