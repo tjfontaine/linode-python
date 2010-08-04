@@ -51,8 +51,8 @@ class ApiError(Exception):
   """Raised when a Linode API call returns an error.
 
   Returns:
-    [{u'ERRORCODE': Error code number,
-      u'ERRORMESSAGE': 'Description of error'}]
+    [{'ERRORCODE': Error code number,
+      'ERRORMESSAGE': 'Description of error'}]
 
   ErrorCodes that can be returned by any method, per Linode API specification:
     0: ok
@@ -139,8 +139,8 @@ class Api:
   of dictionaries).
 
   In the event of API problems, raises ApiError:
-        api.ApiError: [{u'ERRORCODE': 99,
-                        u'ERRORMESSAGE': u'Error Message'}]
+        api.ApiError: [{'ERRORCODE': 99,
+                        'ERRORMESSAGE': 'Error Message'}]
 
   If you do not specify a key, the only method you may use is
   user_getapikey(username, password).  This will retrieve and store
@@ -302,28 +302,28 @@ class Api:
     return decorator
 
   @__api_request(optional=['LinodeID'],
-                 returns=[{u'ALERT_BWIN_ENABLED': '0 or 1',
-                           u'ALERT_BWIN_THRESHOLD': 'integer (Mb/sec?)',
-                           u'ALERT_BWOUT_ENABLED': '0 or 1',
-                           u'ALERT_BWOUT_THRESHOLD': 'integer (Mb/sec?)',
-                           u'ALERT_BWQUOTA_ENABLED': '0 or 1',
-                           u'ALERT_BWQUOTA_THRESHOLD': '0..100',
-                           u'ALERT_CPU_ENABLED': '0 or 1',
-                           u'ALERT_CPU_THRESHOLD': '0..400 (% CPU)',
-                           u'ALERT_DISKIO_ENABLED': '0 or 1',
-                           u'ALERT_DISKIO_THRESHOLD': 'integer (IO ops/sec?)',
-                           u'BACKUPSENABLED': '0 or 1',
-                           u'BACKUPWEEKLYDAY': '0..6 (day of week, 0 = Sunday)',
-                           u'BACKUPWINDOW': 'some integer',
-                           u'DATACENTERID': 'Datacenter ID',
-                           u'LABEL': 'linode label',
-                           u'LINODEID': 'Linode ID',
-                           u'LPM_DISPLAYGROUP': 'group label',
-                           u'STATUS': 'Status flag',
-                           u'TOTALHD': 'available disk (GB)',
-                           u'TOTALRAM': 'available RAM (MB)',
-                           u'TOTALXFER': 'available bandwidth (GB/month)',
-                           u'WATCHDOG': '0 or 1'}])
+                 returns=[{'ALERT_BWIN_ENABLED': '0 or 1',
+                           'ALERT_BWIN_THRESHOLD': 'integer (Mb/sec?)',
+                           'ALERT_BWOUT_ENABLED': '0 or 1',
+                           'ALERT_BWOUT_THRESHOLD': 'integer (Mb/sec?)',
+                           'ALERT_BWQUOTA_ENABLED': '0 or 1',
+                           'ALERT_BWQUOTA_THRESHOLD': '0..100',
+                           'ALERT_CPU_ENABLED': '0 or 1',
+                           'ALERT_CPU_THRESHOLD': '0..400 (% CPU)',
+                           'ALERT_DISKIO_ENABLED': '0 or 1',
+                           'ALERT_DISKIO_THRESHOLD': 'integer (IO ops/sec?)',
+                           'BACKUPSENABLED': '0 or 1',
+                           'BACKUPWEEKLYDAY': '0..6 (day of week, 0 = Sunday)',
+                           'BACKUPWINDOW': 'some integer',
+                           'DATACENTERID': 'Datacenter ID',
+                           'LABEL': 'linode label',
+                           'LINODEID': 'Linode ID',
+                           'LPM_DISPLAYGROUP': 'group label',
+                           'STATUS': 'Status flag',
+                           'TOTALHD': 'available disk (GB)',
+                           'TOTALRAM': 'available RAM (MB)',
+                           'TOTALXFER': 'available bandwidth (GB/month)',
+                           'WATCHDOG': '0 or 1'}])
   def linode_list(self, request):
     """List information about your Linodes.
 
@@ -346,7 +346,7 @@ class Api:
                            'Alert_bwout_threshold', 'Alert_bwquota_enabled',
                            'Alert_bwquota_threshold', 'backupWindow',
                            'backupWeeklyDay', 'watchdog'],
-                 returns={u'LinodeID': 'LinodeID'})
+                 returns={'LinodeID': 'LinodeID'})
   def linode_update(self, request):
     """Update information about, or settings for, a Linode.
 
@@ -355,7 +355,7 @@ class Api:
     pass
 
   @__api_request(required=['DatacenterID', 'PlanID', 'PaymentTerm'],
-                 returns={u'LinodeID': 'New Linode ID'})
+                 returns={'LinodeID': 'New Linode ID'})
   def linode_create(self, request):
     """Create a new Linode.
 
@@ -363,7 +363,7 @@ class Api:
     """
     pass
 
-  @__api_request(required=['LinodeID'], returns={u'JobID': 'Job ID'})
+  @__api_request(required=['LinodeID'], returns={'JobID': 'Job ID'})
   def linode_shutdown(self, request):
     """Submit a shutdown job for a Linode.
 
@@ -373,7 +373,7 @@ class Api:
     pass
 
   @__api_request(required=['LinodeID'], optional=['ConfigID'],
-                 returns={u'JobID': 'Job ID'})
+                 returns={'JobID': 'Job ID'})
   def linode_boot(self, request):
     """Submit a boot job for a Linode.
 
@@ -383,7 +383,7 @@ class Api:
     pass
 
   @__api_request(required=['LinodeID'], optional=['skipChecks'],
-                 returns={u'LinodeID': 'Destroyed Linode ID'})
+                 returns={'LinodeID': 'Destroyed Linode ID'})
   def linode_delete(self, request):
     """Completely, immediately, and totally deletes a Linode.
     Requires all disk images be deleted first, or that the optional
@@ -397,7 +397,7 @@ class Api:
     pass
 
   @__api_request(required=['LinodeID'], optional=['ConfigID'],
-                 returns={u'JobID': 'Job ID'})
+                 returns={'JobID': 'Job ID'})
   def linode_reboot(self, request):
     """Submit a reboot job for a Linode.
     
@@ -416,21 +416,21 @@ class Api:
     pass
 
   @__api_request(required=['LinodeID'],
-                 returns=[{u'Comments': 'comments field',
-                           u'ConfigID': 'Config ID',
-                           u'DiskList': "',,,,,,,,' disk array",
-                           u'helper_depmod': '0 or 1',
-                           u'helper_disableUpdateDB': '0 or 1',
-                           u'helper_libtls': '0 or 1',
-                           u'helper_xen': '0 or 1',
-                           u'KernelID': 'Kernel ID',
-                           u'Label': 'Profile name',
-                           u'LinodeID': 'Linode ID',
-                           u'RAMLimit': 'Max memory (MB), 0 is unlimited',
-                           u'RootDeviceCustom': '',
-                           u'RootDeviceNum': 'root partition (1=first, 0=RootDeviceCustom)',
-                           u'RootDeviceRO': '0 or 1',
-                           u'RunLevel': "in ['default', 'single', 'binbash'"}])
+                 returns=[{'Comments': 'comments field',
+                           'ConfigID': 'Config ID',
+                           'DiskList': "',,,,,,,,' disk array",
+                           'helper_depmod': '0 or 1',
+                           'helper_disableUpdateDB': '0 or 1',
+                           'helper_libtls': '0 or 1',
+                           'helper_xen': '0 or 1',
+                           'KernelID': 'Kernel ID',
+                           'Label': 'Profile name',
+                           'LinodeID': 'Linode ID',
+                           'RAMLimit': 'Max memory (MB), 0 is unlimited',
+                           'RootDeviceCustom': '',
+                           'RootDeviceNum': 'root partition (1=first, 0=RootDeviceCustom)',
+                           'RootDeviceRO': '0 or 1',
+                           'RunLevel': "in ['default', 'single', 'binbash'"}])
   def linode_config_list(self, request):
     """Lists all configuration profiles for a given Linode."""
     pass
@@ -441,7 +441,7 @@ class Api:
                            'RootDeviceCustom', 'RootDeviceRO',
                            'helper_disableUpdateDB', 'helper_xen',
                            'helper_depmod'],
-                 returns={u'ConfigID': 'Config ID'})
+                 returns={'ConfigID': 'Config ID'})
   def linode_config_update(self, request):
     """Updates a configuration profile."""
     pass
@@ -451,13 +451,13 @@ class Api:
                            'RootDeviceNum', 'RootDeviceCustom',
                            'RootDeviceRO', 'helper_disableUpdateDB',
                            'helper_xen', 'helper_depmod'],
-                 returns={u'ConfigID': 'Config ID'})
+                 returns={'ConfigID': 'Config ID'})
   def linode_config_create(self, request):
     """Creates a configuration profile."""
     pass
 
   @__api_request(required=['LinodeID', 'ConfigID'],
-                 returns={u'ConfigID': 'Config ID'})
+                 returns={'ConfigID': 'Config ID'})
   def linode_config_delete(self, request):
     """Deletes a configuration profile.  This does not delete the
     Linode itself, nor its disk images (see linode_disk_delete,
@@ -466,29 +466,29 @@ class Api:
     pass
   
   @__api_request(required=['LinodeID'],
-                 returns=[{u'CREATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
-                           u'DISKID': 'Disk ID',
-                           u'ISREADONLY': '0 or 1',
-                           u'LABEL': 'Disk label',
-                           u'LINODEID': 'Linode ID',
-                           u'SIZE': 'Size of disk (MB)',
-                           u'STATUS': 'Status flag',
-                           u'TYPE': "in ['ext3', 'swap', 'raw']",
-                           u'UPDATE_DT': u'YYYY-MM-DD hh:mm:ss.0'}])
+                 returns=[{'CREATE_DT': 'YYYY-MM-DD hh:mm:ss.0',
+                           'DISKID': 'Disk ID',
+                           'ISREADONLY': '0 or 1',
+                           'LABEL': 'Disk label',
+                           'LINODEID': 'Linode ID',
+                           'SIZE': 'Size of disk (MB)',
+                           'STATUS': 'Status flag',
+                           'TYPE': "in ['ext3', 'swap', 'raw']",
+                           'UPDATE_DT': 'YYYY-MM-DD hh:mm:ss.0'}])
   def linode_disk_list(self, request):
     """Lists all disk images associated with a Linode."""
     pass
 
   @__api_request(required=['LinodeID', 'DiskID'],
                  optional=['Label', 'isReadOnly'],
-                 returns={u'DiskID': 'Disk ID'})
+                 returns={'DiskID': 'Disk ID'})
   def linode_disk_update(self, request):
     """Updates the information about a disk image."""
     pass
 
   @__api_request(required=['LinodeID', 'Type', 'Size', 'Label'],
                  optional=['isReadOnly'],
-                 returns={u'DiskID': 'Disk ID', u'JobID': 'Job ID'})
+                 returns={'DiskID': 'Disk ID', 'JobID': 'Job ID'})
   def linode_disk_create(self, request):
     """Submits a job to create a new disk image.
 
@@ -498,7 +498,7 @@ class Api:
     pass
 
   @__api_request(required=['LinodeID', 'DiskID'],
-                 returns={u'DiskID': 'New Disk ID', u'JobID': 'Job ID'})
+                 returns={'DiskID': 'New Disk ID', 'JobID': 'Job ID'})
   def linode_disk_duplicate(self, request):
     """Submits a job to preform a bit-for-bit copy of a disk image.
 
@@ -508,7 +508,7 @@ class Api:
     pass
 
   @__api_request(required=['LinodeID', 'DiskID'],
-                 returns={u'DiskID': 'Deleted Disk ID', u'JobID': 'Job ID'})
+                 returns={'DiskID': 'Deleted Disk ID', 'JobID': 'Job ID'})
   def linode_disk_delete(self, request):
     """Submits a job to delete a disk image.
 
@@ -520,7 +520,7 @@ class Api:
     pass
 
   @__api_request(required=['LinodeID', 'DiskID', 'Size'],
-                 returns={u'DiskID': 'Disk ID', u'JobID': 'Job ID'})
+                 returns={'DiskID': 'Disk ID', 'JobID': 'Job ID'})
   def linode_disk_resize(self, request):
     """Submits a job to resize a partition.
 
@@ -532,7 +532,7 @@ class Api:
   @__api_request(required=['LinodeID', 'DistributionID', 'rootPass', 'Label',
                            'Size'],
                  optional=['rootSSHKey'],
-                 returns={u'DiskID': 'New Disk ID', u'JobID': 'Job ID'})
+                 returns={'DiskID': 'New Disk ID', 'JobID': 'Job ID'})
   def linode_disk_createfromdistribution(self, request):
     """Submits a job to create a disk image from a Linode template.
 
@@ -542,66 +542,66 @@ class Api:
     pass
 
   @__api_request(required=['LinodeID'],
-                 returns={u'IPAddressID': 'New IP Address ID'})
+                 returns={'IPAddressID': 'New IP Address ID'})
   def linode_ip_addprivate(self, request):
     """Assigns a Private IP to a Linode.  Returns the IPAddressID
     that was added."""
     pass
 
   @__api_request(required=['LinodeID'], optional=['IPAddressID'],
-                 returns=[{u'ISPUBLIC': '0 or 1',
-                           u'IPADDRESS': '192.168.100.1',
-                           u'IPADDRESSID': 'IP address ID',
-                           u'LINODEID': 'Linode ID',
-                           u'RDNS_NAME': 'reverse.dns.name.here'}])
+                 returns=[{'ISPUBLIC': '0 or 1',
+                           'IPADDRESS': '192.168.100.1',
+                           'IPADDRESSID': 'IP address ID',
+                           'LINODEID': 'Linode ID',
+                           'RDNS_NAME': 'reverse.dns.name.here'}])
   def linode_ip_list(self, request):
     """Lists a Linode's IP addresses."""
     pass
 
   @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'],
-                 returns=[{u'ACTION': "API action (e.g. u'linode.create')",
-                           u'DURATION': "Duration spent processing or ''",
-                           u'ENTERED_DT': 'yyyy-mm-dd hh:mm:ss.0',
-                           u'HOST_FINISH_DT': "'yyyy-mm-dd hh:mm:ss.0' or ''",
-                           u'HOST_MESSAGE': 'response from host',
-                           u'HOST_START_DT': "'yyyy-mm-dd hh:mm:ss.0' or ''",
-                           u'HOST_SUCCESS': "1 or ''",
-                           u'JOBID': 'Job ID',
-                           u'LABEL': 'Description of job',
-                           u'LINODEID': 'Linode ID'}])
+                 returns=[{'ACTION': "API action (e.g. 'linode.create')",
+                           'DURATION': "Duration spent processing or ''",
+                           'ENTERED_DT': 'yyyy-mm-dd hh:mm:ss.0',
+                           'HOST_FINISH_DT': "'yyyy-mm-dd hh:mm:ss.0' or ''",
+                           'HOST_MESSAGE': 'response from host',
+                           'HOST_START_DT': "'yyyy-mm-dd hh:mm:ss.0' or ''",
+                           'HOST_SUCCESS': "1 or ''",
+                           'JOBID': 'Job ID',
+                           'LABEL': 'Description of job',
+                           'LINODEID': 'Linode ID'}])
   def linode_job_list(self, request):
     """Returns the contents of the job queue."""
     pass
 
   @__api_request(optional=['isXen'],
-                 returns=[{u'ISXEN': '0 or 1',
-                           u'KERNELID': 'Kernel ID',
-                           u'LABEL': 'kernel version string'}])
+                 returns=[{'ISXEN': '0 or 1',
+                           'KERNELID': 'Kernel ID',
+                           'LABEL': 'kernel version string'}])
   def avail_kernels(self, request):
     """List available kernels."""
     pass
 
-  @__api_request(returns=[{u'CREATE_DT': 'YYYY-MM-DD hh:mm:ss.0',
-                           u'DISTRIBUTIONID': 'Distribution ID',
-                           u'IS64BIT': '0 or 1',
-                           u'LABEL': 'Description of image',
-                           u'MINIMAGESIZE': 'MB required to deploy image'}])
+  @__api_request(returns=[{'CREATE_DT': 'YYYY-MM-DD hh:mm:ss.0',
+                           'DISTRIBUTIONID': 'Distribution ID',
+                           'IS64BIT': '0 or 1',
+                           'LABEL': 'Description of image',
+                           'MINIMAGESIZE': 'MB required to deploy image'}])
   def avail_distributions(self, request):
     """Returns a list of available Linux Distributions."""
     pass
 
-  @__api_request(returns=[{u'DATACENTERID': 'Datacenter ID',
-                           u'LOCATION': 'City, ST, USA'}])
+  @__api_request(returns=[{'DATACENTERID': 'Datacenter ID',
+                           'LOCATION': 'City, ST, USA'}])
   def avail_datacenters(self, request):
     """Returns a list of Linode data center facilities."""
     pass
 
-  @__api_request(returns=[{u'DISK': 'Maximum disk allocation (GB)',
-                           u'LABEL': 'Name of plan', u'PLANID': 'Plan ID',
-                           u'PRICE': 'Price (US dollars)',
-                           u'RAM': 'Maximum memory (MB)',
-                           u'XFER': 'Allowed transfer (GB/mo)',
-                           u'AVAIL': {u'Datacenter ID': 'Quantity'}}])
+  @__api_request(returns=[{'DISK': 'Maximum disk allocation (GB)',
+                           'LABEL': 'Name of plan', 'PLANID': 'Plan ID',
+                           'PRICE': 'Price (US dollars)',
+                           'RAM': 'Maximum memory (MB)',
+                           'XFER': 'Allowed transfer (GB/mo)',
+                           'AVAIL': {'Datacenter ID': 'Quantity'}}])
   def avail_linodeplans(self, request):
     """Returns a structure of Linode PlanIDs containing PlanIDs, and
     their availability in each datacenter.
@@ -610,25 +610,25 @@ class Api:
 
   @__api_request(optional=['StackScriptID', 'DistributionID', 'DistributionVendor',
                             'keywords'],
-                 returns=[{u'CREATE_DT': "'yyyy-mm-dd hh:mm:ss.0'",
-                            u'DEPLOYMENTSACTIVE': 'The number of Scripts that Depend on this Script',
-                            u'REV_DT': "'yyyy-mm-dd hh:mm:ss.0'",
-                            u'DESCRIPTION': 'User defined description of the script',
-                            u'SCRIPT': 'The actual source of the script',
-                            u'ISPUBLIC': '0 or 1',
-                            u'REV_NOTE': 'Comment regarding this revision',
-                            u'LABEL': 'test',
-                            u'LATESTREV': 'The number of the latest revision',
-                            u'DEPLOYMENTSTOTAL': 'Number of times this script has been deployed',
-                            u'STACKSCRIPTID': 'StackScript ID',
-                            u'DISTRIBUTIONIDLIST': 'Comma separated list of distributions this script is available'}])
+                 returns=[{'CREATE_DT': "'yyyy-mm-dd hh:mm:ss.0'",
+                            'DEPLOYMENTSACTIVE': 'The number of Scripts that Depend on this Script',
+                            'REV_DT': "'yyyy-mm-dd hh:mm:ss.0'",
+                            'DESCRIPTION': 'User defined description of the script',
+                            'SCRIPT': 'The actual source of the script',
+                            'ISPUBLIC': '0 or 1',
+                            'REV_NOTE': 'Comment regarding this revision',
+                            'LABEL': 'test',
+                            'LATESTREV': 'The number of the latest revision',
+                            'DEPLOYMENTSTOTAL': 'Number of times this script has been deployed',
+                            'STACKSCRIPTID': 'StackScript ID',
+                            'DISTRIBUTIONIDLIST': 'Comma separated list of distributions this script is available'}])
   def avail_stackscripts(self, request):
     """Returns a list of publicly available StackScript.
     """
     pass
 
   @__api_request(required=['username', 'password'],
-                 returns={u'API_KEY': 'API key', u'USERNAME': 'Username'})
+                 returns={'API_KEY': 'API key', 'USERNAME': 'Username'})
   def user_getapikey(self, request):
     """Given a username and password, returns the user's API key.  The
     key is remembered by this instance for future use.
@@ -639,23 +639,23 @@ class Api:
     pass
 
   @__api_request(optional=['DomainID'],
-                 returns=[{u'STATUS': 'Status flag',
-                           u'RETRY_SEC': 'SOA Retry field',
-                           u'DOMAIN': 'Domain name',
-                           u'DOMAINID': 'Domain ID number',
-                           u'DESCRIPTION': 'Description',
-                           u'MASTER_IPS': 'Master nameservers (for slave zones)',
-                           u'SOA_EMAIL': 'SOA e-mail address (user@domain)',
-                           u'REFRESH_SEC': 'SOA Refresh field',
-                           u'TYPE': 'Type of zone (master or slave)',
-                           u'EXPIRE_SEC': 'SOA Expire field',
-                           u'TTL_SEC': 'Default TTL'}])
+                 returns=[{'STATUS': 'Status flag',
+                           'RETRY_SEC': 'SOA Retry field',
+                           'DOMAIN': 'Domain name',
+                           'DOMAINID': 'Domain ID number',
+                           'DESCRIPTION': 'Description',
+                           'MASTER_IPS': 'Master nameservers (for slave zones)',
+                           'SOA_EMAIL': 'SOA e-mail address (user@domain)',
+                           'REFRESH_SEC': 'SOA Refresh field',
+                           'TYPE': 'Type of zone (master or slave)',
+                           'EXPIRE_SEC': 'SOA Expire field',
+                           'TTL_SEC': 'Default TTL'}])
   def domain_list(self, request):
     """Returns a list of domains associated with this account."""
     pass
 
   @__api_request(required=['DomainID'],
-                 returns={u'DomainID': 'Domain ID number'})
+                 returns={'DomainID': 'Domain ID number'})
   def domain_delete(self, request):
     """Deletes a given domain, by domainid."""
     pass
@@ -663,7 +663,7 @@ class Api:
   @__api_request(required=['Domain', 'Type'],
                  optional=['SOA_Email', 'Refresh_sec', 'Retry_sec',
                            'Expire_sec', 'TTL_sec', 'status', 'master_ips'],
-                 returns={u'DomainID': 'Domain ID number'})
+                 returns={'DomainID': 'Domain ID number'})
   def domain_create(self, request):
     """Create a new domain.
 
@@ -683,7 +683,7 @@ class Api:
                  optional=['Domain', 'Type', 'SOA_Email', 'Refresh_sec',
                            'Retry_sec', 'Expire_sec', 'TTL_sec', 'status',
                            'master_ips'],
-                 returns={u'DomainID': 'Domain ID number'})
+                 returns={'DomainID': 'Domain ID number'})
   def domain_update(self, request):
     """Updates the parameters of a given domain.
 
@@ -694,16 +694,16 @@ class Api:
     pass
 
   @__api_request(required=['DomainID'], optional=['ResourceID'],
-                 returns=[{u'DOMAINID': 'Domain ID number',
-                           u'PROTOCOL': 'Protocol (for SRV)',
-                           u'TTL_SEC': 'TTL for record (0=default)',
-                           u'WEIGHT': 'Weight (for SRV)',
-                           u'NAME': 'The hostname or FQDN',
-                           u'RESOURCEID': 'Resource ID number',
-                           u'PRIORITY': 'Priority (for MX, SRV)',
-                           u'TYPE': 'Resource Type (A, MX, etc)',
-                           u'PORT': 'Port (for SRV)',
-                           u'TARGET': 'The "right hand side" of the record'}])
+                 returns=[{'DOMAINID': 'Domain ID number',
+                           'PROTOCOL': 'Protocol (for SRV)',
+                           'TTL_SEC': 'TTL for record (0=default)',
+                           'WEIGHT': 'Weight (for SRV)',
+                           'NAME': 'The hostname or FQDN',
+                           'RESOURCEID': 'Resource ID number',
+                           'PRIORITY': 'Priority (for MX, SRV)',
+                           'TYPE': 'Resource Type (A, MX, etc)',
+                           'PORT': 'Port (for SRV)',
+                           'TARGET': 'The "right hand side" of the record'}])
   def domain_resource_list(self, request):
     """List the resources associated with a given DomainID."""
     pass
@@ -711,7 +711,7 @@ class Api:
   @__api_request(required=['DomainID', 'Type'],
                  optional=['Name', 'Target', 'Priority', 'Weight',
                            'Port', 'Protocol', 'TTL_Sec'],
-                 returns={u'ResourceID': 'Resource ID number'})
+                 returns={'ResourceID': 'Resource ID number'})
   def domain_resource_create(self, request):
     """Creates a resource within a given DomainID.
 
@@ -726,7 +726,7 @@ class Api:
     pass
 
   @__api_request(required=['DomainID', 'ResourceID'],
-                 returns={u'ResourceID': 'Resource ID number'})
+                 returns={'ResourceID': 'Resource ID number'})
   def domain_resource_delete(self, request):
     """Deletes a Resource from a Domain."""
     pass
@@ -734,7 +734,7 @@ class Api:
   @__api_request(required=['DomainID', 'ResourceID'],
                  optional=['Name', 'Target', 'Priority', 'Weight', 'Port',
                            'Protocol', 'TTL_Sec'],
-                 returns={u'ResourceID': 'Resource ID number'})
+                 returns={'ResourceID': 'Resource ID number'})
   def domain_resource_update(self, request):
     """Updates a domain resource.
 
@@ -749,18 +749,18 @@ class Api:
     pass
 
   @__api_request(optional=['StackScriptID'],
-                 returns=[{u'CREATE_DT': "'yyyy-mm-dd hh:mm:ss.0'",
-                            u'DEPLOYMENTSACTIVE': 'The number of Scripts that Depend on this Script',
-                            u'REV_DT': "'yyyy-mm-dd hh:mm:ss.0'",
-                            u'DESCRIPTION': 'User defined description of the script',
-                            u'SCRIPT': 'The actual source of the script',
-                            u'ISPUBLIC': '0 or 1',
-                            u'REV_NOTE': 'Comment regarding this revision',
-                            u'LABEL': 'test',
-                            u'LATESTREV': 'The number of the latest revision',
-                            u'DEPLOYMENTSTOTAL': 'Number of times this script has been deployed',
-                            u'STACKSCRIPTID': 'StackScript ID',
-                            u'DISTRIBUTIONIDLIST': 'Comma separated list of distributions this script is available'}])
+                 returns=[{'CREATE_DT': "'yyyy-mm-dd hh:mm:ss.0'",
+                            'DEPLOYMENTSACTIVE': 'The number of Scripts that Depend on this Script',
+                            'REV_DT': "'yyyy-mm-dd hh:mm:ss.0'",
+                            'DESCRIPTION': 'User defined description of the script',
+                            'SCRIPT': 'The actual source of the script',
+                            'ISPUBLIC': '0 or 1',
+                            'REV_NOTE': 'Comment regarding this revision',
+                            'LABEL': 'test',
+                            'LATESTREV': 'The number of the latest revision',
+                            'DEPLOYMENTSTOTAL': 'Number of times this script has been deployed',
+                            'STACKSCRIPTID': 'StackScript ID',
+                            'DISTRIBUTIONIDLIST': 'Comma separated list of distributions this script is available'}])
   def stackscript_list(self, request):
     """List StackScripts you have created.
     """
