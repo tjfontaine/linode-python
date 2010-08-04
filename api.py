@@ -146,8 +146,8 @@ class Api:
 
   def __init__(self, key=None, batching=False):
     self.__key = key
-    self.__urlopen = urllib2.request.urlopen
-    self.__request = urllib2.request.Request
+    self.__urlopen = urllib.request.urlopen
+    self.__request = urllib.request.Request
     self.batching = batching
     self.__batch_cache = []
 
