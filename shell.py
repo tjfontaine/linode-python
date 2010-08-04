@@ -67,7 +67,7 @@ if __name__ == "__main__":
   except:
     import simplejson as json
 
-  if environ.has_key('LINODE_API_KEY'):
+  if 'LINODE_API_KEY' in environ:
     key = environ['LINODE_API_KEY']
   else:
     key = getpass('Enter API Key: ')
@@ -109,8 +109,8 @@ if __name__ == "__main__":
     for param,value in optlist[1:]:
       params[param.replace('--', '')] = value
 
-    if command == 'help' or params.has_key('help'):
-      usage(params.has_key('all'))
+    if command == 'help' or 'help' in params:
+      usage('all' in params)
       sys.exit(2)
 
     if hasattr(linode, command):

@@ -24,12 +24,12 @@ class LinodeObject(object):
     name = name.replace('_LinodeObject', '')
     if name == '__entry':
       return self.__dict__[name]
-    elif not self.fields.has_key(name):
+    elif name not in self.fields:
       raise AttributeError
     else:
       f= self.fields[name]
       value = None
-      if self.__entry.has_key(f.field.lower()):
+      if f.field.lower() not in self.__entry:
         value = self.__entry[f.field.lower()]
       return f.to_py(value)
 
@@ -37,7 +37,7 @@ class LinodeObject(object):
     name = name.replace('_LinodeObject', '')
     if name == '__entry':
       object.__setattr__(self, name, value)
-    elif not self.fields.has_key(name):
+    elif name not in self.fields:
       raise AttributeError
     else:
       f = self.fields[name]
@@ -46,7 +46,7 @@ class LinodeObject(object):
   def __str__(self):
     s = []
     for k,v in self.fields.items():
-      if self.__entry.has_key(v.field):
+      if v.field in self.__entry:
         value = v.to_py(self.__entry[v.field])
         if isinstance(value, list):
           s.append('%s: [%s]' % (k, ', '.join([str(x) for x in value])))
@@ -76,7 +76,7 @@ class LinodeObject(object):
     kwargs = self.__resolve_kwargs(kw)
 
     """
-    if not _id_cache.has_key(self):
+    if self not in _id_cache:
       _id_cache[self] = {}
     """
 
@@ -91,7 +91,7 @@ class LinodeObject(object):
     kwargs = self.__resolve_kwargs(kw)
 
     """
-    if not _id_cache.has_key(self):
+    if self not in _id_cache:
       _id_cache[self] = {}
     """
 
@@ -100,7 +100,7 @@ class LinodeObject(object):
     for k,v in _id_cache[self].items():
       found = True
       for i, j in kwargs.items():
-        if not v.has_key(i) or v[i] != j:
+        if i not in v or v[i] != j:
           found = False
           break
       if not found:
@@ -129,7 +129,7 @@ class LinodeObject(object):
     pass
     """
     key = self.__class__
-    if not _id_cache.has_key(key):
+    if key not in _id_cache:
       _id_cache[key] = {}
 
     _id_cache[key][self.__entry[self.primary_key]] = self.__entry
