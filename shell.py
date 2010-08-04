@@ -26,7 +26,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import api
+from . import api
 import code
 import rlcompleter
 import readline
@@ -96,7 +96,7 @@ if __name__ == "__main__":
   if len(sys.argv[1:]) > 0:
     try:
       optlist, args = getopt.getopt(sys.argv[1:], '', options)
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
       print(str(err))
       usage()
       sys.exit(2)
@@ -115,7 +115,7 @@ if __name__ == "__main__":
       func = getattr(linode, command)
       try:
         print(json.dumps(func(**params), indent=2))
-      except api.MissingRequiredArgument, mra:
+      except api.MissingRequiredArgument as mra:
         print('Missing option --%s' % mra.value.lower())
         print('')
         usage()
