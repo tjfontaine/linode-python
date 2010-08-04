@@ -207,7 +207,7 @@ class Linode(LinodeObject):
     'bwquota_enabled'   : BoolField('Alert_bwquota_enabled'),
     'bwquota_threshold' : IntField('Alert_bwquota_threshold'),
     'backup_window'     : IntField('backupWindow'),
-    'backup_weekly_day' : ChoiceField('backupWeeklyDay', choices=range(6)),
+    'backup_weekly_day' : ChoiceField('backupWeeklyDay', choices=list(range(6))),
     'watchdog'          : BoolField('watchdog'),
     'total_ram'         : IntField('TotalRam'),
     'total_diskspace'   : IntField('TotalHD'),
