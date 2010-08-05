@@ -3,6 +3,7 @@
 A quick script to verify that api.py is in sync with Linode's
 published list of methods.
 
+Copyright (c) 2010 Josh Wright <jshwright@gmail.com>
 Copyright (c) 2009 Ryan Tucker <rtucker@gmail.com>
 
 Permission is hereby granted, free of charge, to any person
