@@ -202,7 +202,7 @@ class Api:
 
     req = self.__request(LINODE_API_URL, request, headers)
     response = self.__urlopen(req)
-    response = response.read()
+    response = response.read().decode('utf-8')
 
     logging.debug('Raw Response: '+response)
 
