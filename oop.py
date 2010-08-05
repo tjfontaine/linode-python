@@ -2,8 +2,8 @@ import logging
 
 from os import environ
 
-from .api import Api, LowerCaseDict
-from .fields import *
+from api import Api, LowerCaseDict
+from fields import *
 
 _id_cache = {}
 
