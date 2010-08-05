@@ -789,3 +789,9 @@ class Api:
     """
     pass
 
+  @__api_request(returns=[{'Parameter' : 'Value'}])
+  def test_echo(self, request):
+    """Echo back any parameters
+    """
+    pass
+
