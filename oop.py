@@ -47,7 +47,7 @@ class LinodeObject(object):
   list_method   = None
 
   def __init__(self, entry={}):
-    entry = dict([(str(k), v) for k,v in entry.items()])
+    entry = {str(k):v for k,v in entry.items()}
     self.__entry = LowerCaseDict(entry)
 
   def __getattr__(self, name):
