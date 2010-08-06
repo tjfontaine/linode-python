@@ -542,6 +542,18 @@ class Api:
     """
     pass
 
+  @__api_request(required=['LinodeID', 'StackScriptID', 'StackScriptUDFResponses',
+                           'DistributionID', 'rootPass', 'Label', 'Size'],
+                 returns={u'DiskID': 'New Disk ID', u'JobID': 'Job ID'})
+  def linode_disk_createfromstackscript(self, request):
+    """Submits a job to create a disk image from a Linode template.
+
+    On job submission, returns the disk ID and job ID.  Does not
+    wait for job completion (see linode_job_list). Note: the
+    'StackScriptUDFResponses' must be a valid JSON string.
+    """
+    pass
+
   @__api_request(required=['LinodeID'],
                  returns={u'IPAddressID': 'New IP Address ID'})
   def linode_ip_addprivate(self, request):
