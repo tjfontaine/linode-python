@@ -39,6 +39,32 @@ try:
 except:
   import simplejson as json
 
+try:
+  import VEpycurl
+  def vepycurl_request(url, fields, headers):
+    return (url, fields, headers)
+
+  def vepycurl_open(request):
+    c = VEpycurl.VEpycurl(verifySSL=1)
+    url, fields, headers = request
+    nh = [ '%s: %s' % (k, v) for k,v in headers.items()]
+    c.perform(url, fields, nh)
+    return c.results()
+
+  URLOPEN = vepycurl_open
+  URLREQUEST = vepycurl_request
+except:
+  import warnings
+  ssl_message = 'using urllib instead of pycurl, urllib does not verify SSL remote certificates, there is a risk of compromised communication'
+  warnings.warn(ssl_message, RuntimeWarning)
+
+  def urllib_request(url, fields, headers):
+    fields = urllib.urlencode(fields)
+    return urllib2.Request(url, fields, headers)
+
+  URLOPEN = urllib2.urlopen
+  URLREQUEST = urllib_request
+
 
 class MissingRequiredArgument(Exception):
   """Raised when a required parameter is missing."""
@@ -153,8 +179,8 @@ class Api:
 
   def __init__(self, key=None, batching=False):
     self.__key = key
-    self.__urlopen = urllib2.urlopen
-    self.__request = urllib2.Request
+    self.__urlopen = URLOPEN
+    self.__request = URLREQUEST
     self.batching = batching
     self.__batch_cache = []
 
@@ -201,7 +227,7 @@ class Api:
     request['api_responseFormat'] = 'json'
 
     logging.debug('Parmaters '+str(request))
-    request = urllib.urlencode(request)
+    #request = urllib.urlencode(request)
 
     headers = {
       'User-Agent': 'LinodePython/'+VERSION,
