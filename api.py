@@ -45,7 +45,7 @@ try:
     return (url, fields, headers)
 
   def vepycurl_open(request):
-    c = VEpycurl.VEpycurl(verifySSL=1)
+    c = VEpycurl.VEpycurl(verifySSL=2)
     url, fields, headers = request
     nh = [ '%s: %s' % (k, v) for k,v in headers.items()]
     c.perform(url, fields, nh)
