@@ -75,6 +75,14 @@ parser.add_option('-v', '--verbose', dest='verbose',
   help='enable debug logging in the api', action="store_true",
   default=False,
   )
+parser.add_option('-k', '--kernel', dest='kernel',
+  help='the kernel to assign to the configuration', metavar='KERNELID',
+  action='store', type='int',
+  )
+parser.add_option('-B', '--boot', dest='boot',
+  help='whether or not to issue a boot after a node is created',
+  action='store_true', default=False,
+  )
 
 (options, args) = parser.parse_args()
 
@@ -108,6 +116,9 @@ try:
 
   if not os.path.exists(options.filename):
     raise Exception('Options file must exist')
+
+  if not options.kernel:
+    raise Exception('Must specify a kernel to use for configuration')
 except Exception, ex:
   sys.stderr.write(str(ex) + linesep)
   parser.print_help()
@@ -155,10 +166,12 @@ needFlush = False
 created_linodes = []
 
 def deploy_set():
+  linode_order = []
   for r in linode_api.batchFlush():
     # TODO XXX FIXME handle error states
     linodeid = r['DATA']['LinodeID']
     created_linodes.append(linodeid)
+    linode_order.append(linodeid)
     linode_api.linode_disk_createfromstackscript(
       LinodeID=linodeid,
       StackScriptID=options.stackscript,
@@ -168,6 +181,19 @@ def deploy_set():
       Size=options.disksize,
       rootPass=root_pass,
     )
+  for r in linode_api.batchFlush():
+    # TODO XXX FIXME handle error states
+    linodeid = linode_order.pop(0)
+    diskid = [str(r['DATA']['DiskID'])]
+    for i in range(8): diskid.append('')
+    linode_api.linode_config_create(
+      LinodeID=linodeid,
+      KernelID=options.kernel,
+      Label='From stackscript %d' % (options.stackscript),
+      DiskList=','.join(diskid),
+    )
+    if options.boot:
+      linode_api.linode_boot(LinodeID=linodeid)
   linode_api.batchFlush()
 
 for i in range(options.count):
