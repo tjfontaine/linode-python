@@ -181,6 +181,7 @@ def deploy_set():
       Size=options.disksize,
       rootPass=root_pass,
     )
+  to_boot = []
   for r in linode_api.batchFlush():
     # TODO XXX FIXME handle error states
     linodeid = linode_order.pop(0)
@@ -193,8 +194,14 @@ def deploy_set():
       DiskList=','.join(diskid),
     )
     if options.boot:
-      linode_api.linode_boot(LinodeID=linodeid)
+      to_boot.append(linodeid)
   linode_api.batchFlush()
+
+  for l in to_boot:
+    linode_api.linode_boot(LinodeID=l)
+
+  if len(to_boot):
+    linode_api.batchFlush()
 
 for i in range(options.count):
   if needFlush and i % 25 == 0:
