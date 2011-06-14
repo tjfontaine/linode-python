@@ -28,26 +28,37 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 """
 
-# URL of API documentation
-apidocurl = 'http://www.linode.com/api/autodoc.cfm'
+#The list of subsections found in the API documentation. This should
+#probably be discovered automatically in the future
+api_subsections = ('linode', 'nodebalancer', 'stackscript', 'dns', 'utility')
 
 import api
 import re
-import urllib
+import itertools
+from HTMLParser import HTMLParser
+from urllib import unquote
+from urllib2 import urlopen
 
-tmpfile, httpheaders = urllib.urlretrieve(apidocurl)
-tmpfd = open(tmpfile)
+class SubsectionParser(HTMLParser):
+    base_url = 'http://www.linode.com/api/'
+
+    def __init__(self, subsection):
+        HTMLParser.__init__(self)
+        self.subsection_re = re.compile('/api/%s/(.*)$' % subsection)
+        self.methods = []
+        url = self.base_url + subsection
+        req = urlopen(url)
+        self.feed(req.read())
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'a' and attrs:
+            attr_dict = dict(attrs)
+            match = self.subsection_re.match(attr_dict.get('href', ''))
+            if match:
+                self.methods.append(unquote(match.group(1)).replace('.','_'))
 
 local_methods = api.Api.valid_commands()
-remote_methods = []
-
-# Read in the list of methods Linode has
-rg = re.compile('.*?\\?method=((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-]+))(?![\\w\\.])')
-
-for i in tmpfd.readlines():
-    m = rg.search(i)
-    if m:
-        remote_methods.append(m.group(1).replace('.','_'))
+remote_methods = list(itertools.chain(*[SubsectionParser(subsection).methods for subsection in api_subsections]))
 
 # Cross-check!
 for i in local_methods:
