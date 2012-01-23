@@ -59,7 +59,7 @@ class LinodeObject(object):
     else:
       f= self.fields[name]
       value = None
-      if f.field.lower() not in self.__entry:
+      if f.field.lower() in self.__entry:
         value = self.__entry[f.field.lower()]
       return f.to_py(value)
 
