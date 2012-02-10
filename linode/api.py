@@ -206,6 +206,9 @@ class Api:
 
   def __getattr__(self, name):
     """Return a callable for any undefined attribute and assume it's an API call"""
+    if name.startswith('__'):
+      raise AttributeError()
+
     def generic_request(*args, **kw):
       request = LowerCaseDict(kw)
       request['api_action'] = name.replace('_', '.')
@@ -215,6 +218,7 @@ class Api:
         logging.debug('Batched: %s', json.dumps(request))
       else:
         return self.__send_request(request)
+
     generic_request.__name__ = name
     return generic_request
 
