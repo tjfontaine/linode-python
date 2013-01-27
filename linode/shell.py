@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim:ts=2:sw=2:expandtab
 """
 A Python shell to interact with the Linode API
 
