@@ -29,10 +29,25 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import api
 import code
+import decimal
 import rlcompleter
 import readline
 import atexit
 import os
+try:
+  import json
+except:
+  import simplejson as json
+
+class DecimalEncoder(json.JSONEncoder):
+  """Handle Decimal types when producing JSON.
+
+  Hat tip: http://stackoverflow.com/a/1960649
+  """
+  def _iterencode(self, o, markers=None):
+    if isinstance(o, decimal.Decimal):
+      return (str(o) for o in [o])
+    return super(DecimalEncoder, self)._iterencode(o, markers)
 
 class LinodeConsole(code.InteractiveConsole):
   def __init__(self, locals=None, filename="<console>",
@@ -63,11 +78,6 @@ if __name__ == "__main__":
   from getpass import getpass
   from os import environ
   import getopt, sys
-  try:
-    import json
-  except:
-    import simplejson as json
-
   if 'LINODE_API_KEY' in environ:
     key = environ['LINODE_API_KEY']
   else:
@@ -117,7 +127,7 @@ if __name__ == "__main__":
     if hasattr(linode, command):
       func = getattr(linode, command)
       try:
-        print(json.dumps(func(**params), indent=2))
+        print(json.dumps(func(**params), indent=2, cls=DecimalEncoder))
       except api.MissingRequiredArgument, mra:
         print('Missing option --%s' % mra.value.lower())
         print('')
@@ -135,6 +145,6 @@ if __name__ == "__main__":
     console.runcode('import readline,rlcompleter,api,shell,json')
     console.runcode('readline.parse_and_bind("tab: complete")')
     console.runcode('readline.set_completer(shell.LinodeComplete().complete)')
-    console.runcode('def pp(text=None): print(json.dumps(text, indent=2))')
+    console.runcode('def pp(text=None): print(json.dumps(text, indent=2, cls=shell.DecimalEncoder))')
     console.locals.update({'linode':linode})
     console.interact()
