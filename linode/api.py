@@ -30,6 +30,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from decimal import Decimal
 import logging
 import urllib
 import urllib2
@@ -244,7 +245,7 @@ class Api:
     logging.debug('Raw Response: '+response)
 
     try:
-      s = json.loads(response)
+      s = json.loads(response, parse_float=Decimal)
     except Exception, ex:
       print(response)
       raise ex
@@ -291,6 +292,7 @@ class Api:
           request[k] = params[k]
 
         result = func(self, request)
+
         if result is not None:
           request = result
 
