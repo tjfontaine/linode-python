@@ -26,3 +26,9 @@ Batching
 Batching should be used with care, once enabled all api calls are cached until
 Api.batchFlush() is called, however you must remember the order in which calls
 were made as that's the order of the list returned to you
+
+License
+-------
+
+This code is provided under an MIT-style license. Please refer to the LICENSE
+file in the root of the project for specifics.
