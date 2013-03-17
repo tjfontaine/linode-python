@@ -7,6 +7,7 @@ Copyright (c) 2010 Timothy J Fontaine <tjfontaine@gmail.com>
 Copyright (c) 2010 Josh Wright <jshwright@gmail.com>
 Copyright (c) 2010 Ryan Tucker <rtucker@gmail.com>
 Copyright (c) 2008 James C Sinclair <james@irgeek.com>
+Copyright (c) 2013 Tim Heckman <tim@timheckman.net>
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -41,30 +42,48 @@ except:
   import simplejson as json
 
 try:
-  import VEpycurl
-  def vepycurl_request(url, fields, headers):
-    return (url, fields, headers)
+  import requests
+  from types import MethodType
 
-  def vepycurl_open(request):
-    c = VEpycurl.VEpycurl(verifySSL=2)
-    url, fields, headers = request
-    nh = [ '%s: %s' % (k, v) for k,v in headers.items()]
-    c.perform(url, fields, nh)
-    return c.results()
+  def requests_request(url, fields, headers):
+    return requests.Request(method="POST", url=url, headers=headers, data=fields)
 
-  URLOPEN = vepycurl_open
-  URLREQUEST = vepycurl_request
+  def requests_open(request):
+    r = request.prepare()
+    s = requests.Session()
+    s.verify = True
+    response = s.send(r)
+    response.read = MethodType(lambda x: x.text, response)
+    return response
+
+  URLOPEN = requests_open
+  URLREQUEST = requests_request
 except:
-  import warnings
-  ssl_message = 'using urllib instead of pycurl, urllib does not verify SSL remote certificates, there is a risk of compromised communication'
-  warnings.warn(ssl_message, RuntimeWarning)
+  try:
+    import VEpycurl
+    def vepycurl_request(url, fields, headers):
+      return (url, fields, headers)
 
-  def urllib_request(url, fields, headers):
-    fields = urllib.urlencode(fields)
-    return urllib2.Request(url, fields, headers)
+    def vepycurl_open(request):
+      c = VEpycurl.VEpycurl(verifySSL=2)
+      url, fields, headers = request
+      nh = [ '%s: %s' % (k, v) for k,v in headers.items()]
+      c.perform(url, fields, nh)
+      return c.results()
 
-  URLOPEN = urllib2.urlopen
-  URLREQUEST = urllib_request
+    URLOPEN = vepycurl_open
+    URLREQUEST = vepycurl_request
+  except:
+    import warnings
+    ssl_message = 'using urllib instead of pycurl, urllib does not verify SSL remote certificates, there is a risk of compromised communication'
+    warnings.warn(ssl_message, RuntimeWarning)
+
+    def urllib_request(url, fields, headers):
+      fields = urllib.urlencode(fields)
+      return urllib2.Request(url, fields, headers)
+
+    URLOPEN = urllib2.urlopen
+    URLREQUEST = urllib_request
 
 
 class MissingRequiredArgument(Exception):
