@@ -38,8 +38,10 @@ import urllib2
 
 try:
   import json
+  FULL_BODIED_JSON = True
 except:
   import simplejson as json
+  FULL_BODIED_JSON = False
 
 try:
   import requests
@@ -263,11 +265,15 @@ class Api:
 
     logging.debug('Raw Response: '+response)
 
-    try:
-      s = json.loads(response, parse_float=Decimal)
-    except Exception, ex:
-      print(response)
-      raise ex
+    if FULL_BODIED_JSON:
+      try:
+        s = json.loads(response, parse_float=Decimal)
+      except Exception, ex:
+        print(response)
+        raise ex
+    else:
+      # Stuck with simplejson, which won't let us parse_float
+      s = json.loads(response)
 
     if isinstance(s, dict):
       s = LowerCaseDict(s)
