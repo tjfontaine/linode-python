@@ -818,6 +818,42 @@ class Api:
     """
     pass
 
+  @__api_request(optional=['NodeBalancerID'],
+                 returns=[{u'ADDRESS4': 'IPv4 IP address of the NodeBalancer',
+                           u'ADDRESS6': 'IPv6 IP address of the NodeBalancer',
+                           u'CLIENTCONNTHROTTLE': 'Allowed connections per second, per client IP',
+                           u'HOSTNAME': 'NodeBalancer hostname',
+                           u'LABEL': 'NodeBalancer label',
+                           u'NODEBALANCERID': 'NodeBalancer ID',
+                           u'STATUS': 'NodeBalancer status, as a string'}])
+  def nodebalancer_list(self, request):
+    """List information about your NodeBalancers."""
+    pass
+
+  @__api_request(required=['NodeBalancerID'],
+                 optional=['Label',
+                           'ClientConnThrottle'],
+                 returns={u'NodeBalancerID': 'NodeBalancerID'})
+  def nodebalancer_update(self, request):
+    """Update information about, or settings for, a Nodebalancer.
+
+    See nodebalancer_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['DatacenterID', 'PaymentTerm'],
+                 returns={u'NodeBalancerID' : 'ID of the created NodeBalancer'})
+  def nodebalancer_create(self, request):
+    """Creates a NodeBalancer."""
+    pass
+
+  @__api_request(required=['NodeBalancerID'],
+                 returns={u'NodeBalancerID': 'Destroyed NodeBalancer ID'})
+  def nodebalancer_delete(self, request):
+    """Immediately removes a NodeBalancer from your account and issues
+       a pro-rated credit back to your account, if applicable."""
+    pass
+
   @__api_request(optional=['StackScriptID'],
                  returns=[{u'CREATE_DT': "'yyyy-mm-dd hh:mm:ss.0'",
                             u'DEPLOYMENTSACTIVE': 'The number of Scripts that Depend on this Script',
