@@ -854,6 +854,55 @@ class Api:
        a pro-rated credit back to your account, if applicable."""
     pass
 
+  @__api_request(required=['NodeBalancerID'],
+                 optional=['ConfigID'],
+                 returns=[{
+                           u'ALGORITHM': 'Balancing algorithm.',
+                           u'CHECK': 'Type of health check to perform.',
+                           u'CHECK_ATTEMPTS': 'Number of failed probes allowed.',
+                           u'CHECK_BODY': 'A regex against the expected result body.',
+                           u'CHECK_INTERVAL': 'Seconds between health check probes.',
+                           u'CHECK_PATH': 'The path of the health check request.',
+                           u'CHECK_TIMEOUT': 'Seconds to wait before calling a failure.',
+                           u'CONFIGID': 'ID of this config',
+                           u'NODEBALANCERID': 'NodeBalancer ID.',
+                           u'PORT': 'Port to bind to on public interface.',
+                           u'PROTOCOL': 'The protocol to be used (tcp or http).',
+                           u'STICKINESS': 'Session persistence.'}])
+  def nodebalancer_config_list(self, request):
+    """List information about your NodeBalancer Configs."""
+    pass
+
+  @__api_request(required=['ConfigID'],
+                 optional=['Algorithm', 'check', 'check_attempts', 'check_body',
+                           'check_interval', 'check_path', 'check_timeout',
+                           'Port', 'Protocol', 'Stickiness'],
+                 returns={u'ConfigID': 'The ConfigID you passed in the first place.'})
+  def nodebalancer_config_update(self, request):
+    """Update information about, or settings for, a Nodebalancer Config.
+
+    See nodebalancer_config_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['NodeBalancerID'],
+                 optional=['Algorithm', 'check', 'check_attempts', 'check_body',
+                           'check_interval', 'check_path', 'check_timeout',
+                           'Port', 'Protocol', 'Stickiness'],
+                 returns={u'ConfigID': 'The ConfigID of the new Config.'})
+  def nodebalancer_config_create(self, request):
+    """Create a Nodebalancer Config.
+
+    See nodebalancer_config_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['ConfigID'],
+                 returns={u'ConfigID': 'Destroyed Config ID'})
+  def nodebalancer_config_delete(self, request):
+    """Deletes a NodeBalancer's Config."""
+    pass
+
   @__api_request(optional=['StackScriptID'],
                  returns=[{u'CREATE_DT': "'yyyy-mm-dd hh:mm:ss.0'",
                             u'DEPLOYMENTSACTIVE': 'The number of Scripts that Depend on this Script',
