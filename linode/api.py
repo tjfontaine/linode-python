@@ -903,6 +903,46 @@ class Api:
     """Deletes a NodeBalancer's Config."""
     pass
 
+  @__api_request(required=['ConfigID'],
+                 optional=['NodeID'],
+                 returns=[{u'ADDRESS': 'Address:port combination for the node.',
+                           u'CONFIGID': 'ConfigID of this node\'s config.',
+                           u'LABEL': 'The backend node\'s label.',
+                           u'MODE': 'Connection mode for this node.',
+                           u'NODEBALANCERID': 'ID of this node\'s nodebalancer.',
+                           u'NODEID': 'NodeID.',
+                           u'STATUS': 'Node\'s status in the nodebalancer.',
+                           u'WEIGHT': 'Load balancing weight.'}])
+  def nodebalancer_node_list(self, request):
+    """List information about your NodeBalancer Nodes."""
+    pass
+
+  @__api_request(required=['NodeID'],
+                 optional=['Label', 'Address', 'Weight', 'Mode'],
+                 returns={u'NodeID': 'The NodeID you passed in the first place.'})
+  def nodebalancer_node_update(self, request):
+    """Update information about, or settings for, a Nodebalancer Node.
+
+    See nodebalancer_node_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['ConfigID', 'Label', 'Address'],
+                 optional=['Weight', 'Mode'],
+                 returns={u'NodeID': 'The NodeID of the new Node.'})
+  def nodebalancer_node_create(self, request):
+    """Create a Nodebalancer Node.
+
+    See nodebalancer_node_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['NodeID'],
+                 returns={u'NodeID': 'Destroyed Node ID'})
+  def nodebalancer_node_delete(self, request):
+    """Deletes a NodeBalancer Node."""
+    pass
+
   @__api_request(optional=['StackScriptID'],
                  returns=[{u'CREATE_DT': "'yyyy-mm-dd hh:mm:ss.0'",
                             u'DEPLOYMENTSACTIVE': 'The number of Scripts that Depend on this Script',
