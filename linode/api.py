@@ -8,6 +8,7 @@ Copyright (c) 2010 Josh Wright <jshwright@gmail.com>
 Copyright (c) 2010 Ryan Tucker <rtucker@gmail.com>
 Copyright (c) 2008 James C Sinclair <james@irgeek.com>
 Copyright (c) 2013 Tim Heckman <tim@timheckman.net>
+Copyright (c) 2014 Magnus Appelquist <magnus.appelquist@cloudnet.se>
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -626,6 +627,14 @@ class Api:
                            u'RDNS_NAME': 'reverse.dns.name.here'}])
   def linode_ip_list(self, request):
     """Lists a Linode's IP addresses."""
+    pass
+
+  @__api_request(required=['IPAddressID','Hostname'],
+                 returns=[{u'HOSTNAME': 'reverse.dns.name.here',
+                           u'IPADDRESS': '192.168.100.1',
+                           u'IPADDRESSID': 'IP address ID'}])
+  def linode_ip_setrdns(self, request):
+    """Sets the reverse DNS name of a public Linode IP."""
     pass
 
   @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'],
