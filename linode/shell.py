@@ -42,12 +42,12 @@ except:
 class DecimalEncoder(json.JSONEncoder):
   """Handle Decimal types when producing JSON.
 
-  Hat tip: http://stackoverflow.com/a/1960649
+  Hat tip: http://stackoverflow.com/questions/4019856/decimal-to-json
   """
-  def _iterencode(self, o, markers=None):
+  def default(self, o):
     if isinstance(o, decimal.Decimal):
-      return (str(o) for o in [o])
-    return super(DecimalEncoder, self)._iterencode(o, markers)
+      return float(o)
+    return json.JSONEncoder.default(self, o)
 
 class LinodeConsole(code.InteractiveConsole):
   def __init__(self, locals=None, filename="<console>",
