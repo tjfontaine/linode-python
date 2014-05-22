@@ -8,6 +8,7 @@ Copyright (c) 2010 Josh Wright <jshwright@gmail.com>
 Copyright (c) 2010 Ryan Tucker <rtucker@gmail.com>
 Copyright (c) 2008 James C Sinclair <james@irgeek.com>
 Copyright (c) 2013 Tim Heckman <tim@timheckman.net>
+Copyright (c) 2014 Magnus Appelquist <magnus.appelquist@cloudnet.se>
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -628,6 +629,14 @@ class Api:
     """Lists a Linode's IP addresses."""
     pass
 
+  @__api_request(required=['IPAddressID','Hostname'],
+                 returns=[{u'HOSTNAME': 'reverse.dns.name.here',
+                           u'IPADDRESS': '192.168.100.1',
+                           u'IPADDRESSID': 'IP address ID'}])
+  def linode_ip_setrdns(self, request):
+    """Sets the reverse DNS name of a public Linode IP."""
+    pass
+
   @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'],
                  returns=[{u'ACTION': "API action (e.g. u'linode.create')",
                            u'DURATION': "Duration spent processing or ''",
@@ -816,6 +825,131 @@ class Api:
     use the source IP address of the request as the target, e.g.
     for updating pointers to dynamic IP addresses.
     """
+    pass
+
+  @__api_request(optional=['NodeBalancerID'],
+                 returns=[{u'ADDRESS4': 'IPv4 IP address of the NodeBalancer',
+                           u'ADDRESS6': 'IPv6 IP address of the NodeBalancer',
+                           u'CLIENTCONNTHROTTLE': 'Allowed connections per second, per client IP',
+                           u'HOSTNAME': 'NodeBalancer hostname',
+                           u'LABEL': 'NodeBalancer label',
+                           u'NODEBALANCERID': 'NodeBalancer ID',
+                           u'STATUS': 'NodeBalancer status, as a string'}])
+  def nodebalancer_list(self, request):
+    """List information about your NodeBalancers."""
+    pass
+
+  @__api_request(required=['NodeBalancerID'],
+                 optional=['Label',
+                           'ClientConnThrottle'],
+                 returns={u'NodeBalancerID': 'NodeBalancerID'})
+  def nodebalancer_update(self, request):
+    """Update information about, or settings for, a Nodebalancer.
+
+    See nodebalancer_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['DatacenterID', 'PaymentTerm'],
+                 returns={u'NodeBalancerID' : 'ID of the created NodeBalancer'})
+  def nodebalancer_create(self, request):
+    """Creates a NodeBalancer."""
+    pass
+
+  @__api_request(required=['NodeBalancerID'],
+                 returns={u'NodeBalancerID': 'Destroyed NodeBalancer ID'})
+  def nodebalancer_delete(self, request):
+    """Immediately removes a NodeBalancer from your account and issues
+       a pro-rated credit back to your account, if applicable."""
+    pass
+
+  @__api_request(required=['NodeBalancerID'],
+                 optional=['ConfigID'],
+                 returns=[{
+                           u'ALGORITHM': 'Balancing algorithm.',
+                           u'CHECK': 'Type of health check to perform.',
+                           u'CHECK_ATTEMPTS': 'Number of failed probes allowed.',
+                           u'CHECK_BODY': 'A regex against the expected result body.',
+                           u'CHECK_INTERVAL': 'Seconds between health check probes.',
+                           u'CHECK_PATH': 'The path of the health check request.',
+                           u'CHECK_TIMEOUT': 'Seconds to wait before calling a failure.',
+                           u'CONFIGID': 'ID of this config',
+                           u'NODEBALANCERID': 'NodeBalancer ID.',
+                           u'PORT': 'Port to bind to on public interface.',
+                           u'PROTOCOL': 'The protocol to be used (tcp or http).',
+                           u'STICKINESS': 'Session persistence.'}])
+  def nodebalancer_config_list(self, request):
+    """List information about your NodeBalancer Configs."""
+    pass
+
+  @__api_request(required=['ConfigID'],
+                 optional=['Algorithm', 'check', 'check_attempts', 'check_body',
+                           'check_interval', 'check_path', 'check_timeout',
+                           'Port', 'Protocol', 'Stickiness'],
+                 returns={u'ConfigID': 'The ConfigID you passed in the first place.'})
+  def nodebalancer_config_update(self, request):
+    """Update information about, or settings for, a Nodebalancer Config.
+
+    See nodebalancer_config_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['NodeBalancerID'],
+                 optional=['Algorithm', 'check', 'check_attempts', 'check_body',
+                           'check_interval', 'check_path', 'check_timeout',
+                           'Port', 'Protocol', 'Stickiness'],
+                 returns={u'ConfigID': 'The ConfigID of the new Config.'})
+  def nodebalancer_config_create(self, request):
+    """Create a Nodebalancer Config.
+
+    See nodebalancer_config_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['ConfigID'],
+                 returns={u'ConfigID': 'Destroyed Config ID'})
+  def nodebalancer_config_delete(self, request):
+    """Deletes a NodeBalancer's Config."""
+    pass
+
+  @__api_request(required=['ConfigID'],
+                 optional=['NodeID'],
+                 returns=[{u'ADDRESS': 'Address:port combination for the node.',
+                           u'CONFIGID': 'ConfigID of this node\'s config.',
+                           u'LABEL': 'The backend node\'s label.',
+                           u'MODE': 'Connection mode for this node.',
+                           u'NODEBALANCERID': 'ID of this node\'s nodebalancer.',
+                           u'NODEID': 'NodeID.',
+                           u'STATUS': 'Node\'s status in the nodebalancer.',
+                           u'WEIGHT': 'Load balancing weight.'}])
+  def nodebalancer_node_list(self, request):
+    """List information about your NodeBalancer Nodes."""
+    pass
+
+  @__api_request(required=['NodeID'],
+                 optional=['Label', 'Address', 'Weight', 'Mode'],
+                 returns={u'NodeID': 'The NodeID you passed in the first place.'})
+  def nodebalancer_node_update(self, request):
+    """Update information about, or settings for, a Nodebalancer Node.
+
+    See nodebalancer_node_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['ConfigID', 'Label', 'Address'],
+                 optional=['Weight', 'Mode'],
+                 returns={u'NodeID': 'The NodeID of the new Node.'})
+  def nodebalancer_node_create(self, request):
+    """Create a Nodebalancer Node.
+
+    See nodebalancer_node_list.__doc__ for information on parameters.
+    """
+    pass
+
+  @__api_request(required=['NodeID'],
+                 returns={u'NodeID': 'Destroyed Node ID'})
+  def nodebalancer_node_delete(self, request):
+    """Deletes a NodeBalancer Node."""
     pass
 
   @__api_request(optional=['StackScriptID'],
