@@ -676,14 +676,18 @@ class Api:
     pass
 
   @__api_request(returns=[{u'DISK': 'Maximum disk allocation (GB)',
-                           u'LABEL': 'Name of plan', u'PLANID': 'Plan ID',
-                           u'PRICE': 'Price (US dollars)',
+                           u'LABEL': 'Name of plan',
+                           u'PLANID': 'Plan ID',
+                           u'PRICE': 'Monthly price (US dollars)',
+                           u'HOURLY': 'Hourly price (US dollars)',
                            u'RAM': 'Maximum memory (MB)',
                            u'XFER': 'Allowed transfer (GB/mo)',
                            u'AVAIL': {u'Datacenter ID': 'Quantity'}}])
   def avail_linodeplans(self, request):
     """Returns a structure of Linode PlanIDs containing PlanIDs, and
     their availability in each datacenter.
+
+    This plan is deprecated and will be removed in the future.
     """
     pass
 
