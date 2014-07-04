@@ -8,7 +8,7 @@ The bindings consist of three pieces:
   - oop.py: An object oriented interface to api.py inspired by django
 
 For definitive documentation on how the api works please visit:
-http://www.linode.com/api/index.cfm
+https://www.linode.com/api
 
 ## API Keys
 
