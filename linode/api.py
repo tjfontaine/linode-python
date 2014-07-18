@@ -503,6 +503,12 @@ class Api:
     """Lists all configuration profiles for a given Linode."""
     pass
 
+  @__api_request(required=['LinodeID','KernelID','Label'],
+                 returns=[{u'ConfigID': 'Config ID'}])
+  def linode_config_create(self, request):
+    """Creates a new configuration profile for a given Linode."""
+    pass
+
   @__api_request(required=['LinodeID', 'ConfigID'],
                  optional=['KernelID', 'Label', 'Comments', 'RAMLimit',
                            'DiskList', 'RunLevel', 'RootDeviceNum',
