@@ -413,11 +413,14 @@ class Api:
     """
     pass
 
-  @__api_request(required=['LinodeID', 'DatacenterID', 'PlanID', 'PaymentTerm'],
+  @__api_request(required=['LinodeID', 'DatacenterID', 'PlanID'],
+                 optional=['PaymentTerm'],
                  returns={u'LinodeID': 'New Linode ID'})
   def linode_clone(self, request):
-    """Create a new Linode.
-
+    """Create a new Linode, then clone the specified LinodeID to the
+    new Linode.  It is recommended that the source Linode be powered
+    down during the clone.
+    
     This will create a billing event.
     """
     pass
