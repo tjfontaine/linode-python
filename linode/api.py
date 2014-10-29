@@ -649,6 +649,15 @@ class Api:
     """Sets the reverse DNS name of a public Linode IP."""
     pass
 
+  @__api_request(required=['IPAddressID'],
+                 optional=['withIPAddressID', 'toLinodeID'],
+                 returns=[{u'ACTION': "linode.ip.swap",
+                           u'ERRORARRAY': 'Array of errors',
+                           u'DATA': 'The response'}])
+  def linode_ip_swap(self, request):
+    """Exchanges Public IP addresses between two Linodes within a Datacenter"""
+    pass
+
   @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'],
                  returns=[{u'ACTION': "API action (e.g. u'linode.create')",
                            u'DURATION': "Duration spent processing or ''",
