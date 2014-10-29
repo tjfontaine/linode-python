@@ -631,6 +631,13 @@ class Api:
     that was added."""
     pass
 
+  @__api_request(required=['LinodeID'],
+                 returns={u'IPAddressID': 'New IP Address ID'})
+  def linode_ip_addpublic(self, request):
+    """Assigns a Public IP to a Linode.  Returns the IPAddressID
+    that was added."""
+    pass
+
   @__api_request(required=['LinodeID'], optional=['IPAddressID'],
                  returns=[{u'ISPUBLIC': '0 or 1',
                            u'IPADDRESS': '192.168.100.1',
