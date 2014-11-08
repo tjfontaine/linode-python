@@ -631,6 +631,14 @@ class Api:
     that was added."""
     pass
 
+  @__api_request(required=['LinodeID'],
+                 returns={u'IPADDRESSID': 'New IP Address ID',
+                           u'IPADDRESS': '192.168.100.1'})
+  def linode_ip_addpublic(self, request):
+    """Assigns a Public IP to a Linode.  Returns the IPAddressID
+    that was added."""
+    pass
+
   @__api_request(required=['LinodeID'], optional=['IPAddressID'],
                  returns=[{u'ISPUBLIC': '0 or 1',
                            u'IPADDRESS': '192.168.100.1',
@@ -647,6 +655,15 @@ class Api:
                            u'IPADDRESSID': 'IP address ID'}])
   def linode_ip_setrdns(self, request):
     """Sets the reverse DNS name of a public Linode IP."""
+    pass
+
+  @__api_request(required=['IPAddressID'],
+                 optional=['withIPAddressID', 'toLinodeID'],
+                 returns=[{u'LINODEID': 'The ID of the Linode',
+                           u'IPAADDRESS': '192.168.100.1',
+                           u'IPADDRESSID': 'IP address ID'}])
+  def linode_ip_swap(self, request):
+    """Exchanges Public IP addresses between two Linodes within a Datacenter"""
     pass
 
   @__api_request(required=['LinodeID'], optional=['pendingOnly', 'JobID'],
