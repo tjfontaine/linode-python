@@ -269,7 +269,7 @@ class Api:
     if FULL_BODIED_JSON:
       try:
         s = json.loads(response, parse_float=Decimal)
-      except Exception, ex:
+      except Exception as ex:
         print(response)
         raise ex
     else:

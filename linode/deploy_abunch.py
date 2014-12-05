@@ -119,7 +119,7 @@ try:
 
   if not options.kernel:
     raise Exception('Must specify a kernel to use for configuration')
-except Exception, ex:
+except Exception as ex:
   sys.stderr.write(str(ex) + linesep)
   parser.print_help()
   sys.exit('All options are required (yes I see the contradiction)')
@@ -135,7 +135,7 @@ if 'LINODE_API_KEY' in environ:
 else:
   api_key = getpass('Enter API Key: ')
 
-print 'Passwords  must contain at least two of these four character classes: lower case letters - upper case letters - numbers - punctuation'
+print('Passwords  must contain at least two of these four character classes: lower case letters - upper case letters - numbers - punctuation')
 root_pass = getpass('Enter the root password for all resulting nodes: ')
 root_pass2 = getpass('Re-Enter the root password: ')
 
@@ -219,5 +219,5 @@ if needFlush:
   needFlush = False
   deploy_set()
 
-print 'List of created Linodes:'
-print '[%s]' % (', '.join([str(l) for l in created_linodes]))
+print('List of created Linodes:')
+print('[%s]' % (', '.join([str(l) for l in created_linodes])))

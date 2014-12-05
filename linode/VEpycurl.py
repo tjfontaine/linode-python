@@ -81,9 +81,9 @@ class VEpycurl() :
         if verbose :
             self.pco.setopt(pycurl.VERBOSE, 1)
         if debug :
-            print 'PyCurl version info:'
-            print pycurl.version_info()
-            print
+            print('PyCurl version info:')
+            print(pycurl.version_info())
+            print()
             self.pco.setopt(pycurl.DEBUGFUNCTION, self.debug)
         return
  
@@ -113,12 +113,12 @@ class VEpycurl() :
         return self.pc
  
     def debug(self, debug_type, debug_msg) :
-        print 'debug(%d): %s' % (debug_type, debug_msg)
+        print('debug(%d): %s' % (debug_type, debug_msg))
         return
  
 try:
     # only call this once in a process.  see libcurl docs for more info.
     pycurl.global_init(pycurl.GLOBAL_ALL)
 except:
-    print 'Fatal error: call to pycurl.global_init() failed for some reason'
+    print('Fatal error: call to pycurl.global_init() failed for some reason')
     sys.exit(1)
