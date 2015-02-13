@@ -91,8 +91,8 @@ except:
 
 class MissingRequiredArgument(Exception):
   """Raised when a required parameter is missing."""
-  
-  def __init__(self, value):
+
+  def __init__(self, value=str()):
     self.value = value
   def __str__(self):
     return repr(self.value)
@@ -123,8 +123,8 @@ class ApiError(Exception):
     40: Limit of Linodes added per hour reached
     41: Linode must have no disks before delete
   """
-  
-  def __init__(self, value):
+
+  def __init__(self, value=str()):
     self.value = value
   def __str__(self):
     return repr(self.value)
@@ -343,7 +343,7 @@ class Api:
       if returns and wrapper.__doc__:
         # we either have a list of dicts or a just plain dict
         if len(wrapper.__doc__.split('\n')) is 1:  # one-liners need whitespace
-          wrapper.__doc__ += '\n' 
+          wrapper.__doc__ += '\n'
         if isinstance(returns, list):
           width = max(len(q) for q in returns[0].keys())
           wrapper.__doc__ += '\n    Returns list of dictionaries:\n\t[{\n'
@@ -420,11 +420,11 @@ class Api:
     """Create a new Linode, then clone the specified LinodeID to the
     new Linode.  It is recommended that the source Linode be powered
     down during the clone.
-    
+
     This will create a billing event.
     """
     pass
-	
+
   @__api_request(required=['DatacenterID', 'PlanID', 'PaymentTerm'],
                  returns={u'LinodeID': 'New Linode ID'})
   def linode_create(self, request):
@@ -471,7 +471,7 @@ class Api:
                  returns={u'JobID': 'Job ID'})
   def linode_reboot(self, request):
     """Submit a reboot job for a Linode.
-    
+
     On job submission, returns the job ID.  Does not wait for job
     completion (see linode_job_list).
     """
@@ -535,7 +535,7 @@ class Api:
     linode_delete).
     """
     pass
-  
+
   @__api_request(required=['LinodeID'],
                  returns=[{u'CREATE_DT': u'YYYY-MM-DD hh:mm:ss.0',
                            u'DISKID': 'Disk ID',
