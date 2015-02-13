@@ -92,10 +92,12 @@ except:
 class MissingRequiredArgument(Exception):
   """Raised when a required parameter is missing."""
 
-  def __init__(self, value=str()):
+  def __init__(self, value):
     self.value = value
   def __str__(self):
     return repr(self.value)
+  def __reduce__(self):
+    return (self.__class__, (self.value, ))
 
 class ApiError(Exception):
   """Raised when a Linode API call returns an error.
@@ -124,10 +126,12 @@ class ApiError(Exception):
     41: Linode must have no disks before delete
   """
 
-  def __init__(self, value=str()):
+  def __init__(self, value):
     self.value = value
   def __str__(self):
     return repr(self.value)
+  def __reduce__(self):
+    return (self.__class__, (self.value, ))
 
 class ApiInfo:
   valid_commands = {}
