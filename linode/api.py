@@ -643,7 +643,7 @@ class Api:
     that was added."""
     pass
 
-  @__api_request(required=['LinodeID'], optional=['IPAddressID'],
+  @__api_request(optional=['IPAddressID', 'LinodeID'],
                  returns=[{u'ISPUBLIC': '0 or 1',
                            u'IPADDRESS': '192.168.100.1',
                            u'IPADDRESSID': 'IP address ID',
