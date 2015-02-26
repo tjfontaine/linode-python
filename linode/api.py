@@ -36,6 +36,7 @@ from decimal import Decimal
 import logging
 import urllib
 import urllib2
+import copy
 
 try:
   import json
@@ -257,7 +258,13 @@ class Api:
 
     request['api_responseFormat'] = 'json'
 
-    logging.debug('Parmaters '+str(request))
+    request_log = copy.deepcopy(request)
+    redact = ['api_key','rootsshkey','rootpass']
+    for r in redact:
+        if r in request_log:
+            request_log[r] = '{0}: xxxx REDACTED xxxx'.format(r)
+
+    logging.debug('Parameters '+str(request_log))
     #request = urllib.urlencode(request)
 
     headers = {
@@ -293,7 +300,7 @@ class Api:
       return s
 
   def __api_request(required=[], optional=[], returns=[]):
-    """Decorator to define required and optional paramters"""
+    """Decorator to define required and optional parameters"""
     for k in required:
       k = k.lower()
       if k not in ApiInfo.valid_params:
