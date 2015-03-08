@@ -8,4 +8,7 @@ setup(
     author_email = "tjfontaine@gmail.com",
     url = "https://github.com/tjfontaine/linode-python",
     packages = ['linode'],
+    extras_require = {
+        'requests': ["requests"],
+    },
 )
