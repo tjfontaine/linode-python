@@ -436,7 +436,8 @@ class Api:
     """
     pass
 
-  @__api_request(required=['DatacenterID', 'PlanID', 'PaymentTerm'],
+  @__api_request(required=['DatacenterID', 'PlanID'],
+                 optional=['PaymentTerm'],
                  returns={u'LinodeID': 'New Linode ID'})
   def linode_create(self, request):
     """Create a new Linode.
