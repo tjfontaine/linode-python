@@ -389,6 +389,7 @@ class Api:
                            u'LABEL': 'linode label',
                            u'LINODEID': 'Linode ID',
                            u'LPM_DISPLAYGROUP': 'group label',
+                           u'PLANID': 'plan id',
                            u'STATUS': 'Status flag',
                            u'TOTALHD': 'available disk (GB)',
                            u'TOTALRAM': 'available RAM (MB)',
