@@ -557,7 +557,7 @@ class Api:
                            u'LINODEID': 'Linode ID',
                            u'SIZE': 'Size of disk (MB)',
                            u'STATUS': 'Status flag',
-                           u'TYPE': "in ['ext3', 'swap', 'raw']",
+                           u'TYPE': "in ['ext4', 'ext3', 'swap', 'raw']",
                            u'UPDATE_DT': u'YYYY-MM-DD hh:mm:ss.0'}])
   def linode_disk_list(self, request):
     """Lists all disk images associated with a Linode."""
