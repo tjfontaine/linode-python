@@ -447,6 +447,15 @@ class Api:
     """
     pass
 
+  @__api_request(required=['DatacenterID', 'PlanID', 'PaymentTerm', 'LinodeID'],
+                 returns={u'LinodeID': 'New Linode ID'})
+  def linode_clone(self, request):
+    """Clone a new Linode from a given Linode.
+
+    This will create a billing event.
+    """
+    pass
+
   @__api_request(required=['LinodeID'], returns={u'JobID': 'Job ID'})
   def linode_shutdown(self, request):
     """Submit a shutdown job for a Linode.
@@ -517,6 +526,12 @@ class Api:
                            u'RunLevel': "in ['default', 'single', 'binbash'"}])
   def linode_config_list(self, request):
     """Lists all configuration profiles for a given Linode."""
+    pass
+
+  @__api_request(required=['LinodeID','KernelID','Label'],
+                 returns=[{u'ConfigID': 'Config ID'}])
+  def linode_config_create(self, request):
+    """Creates a new configuration profile for a given Linode."""
     pass
 
   @__api_request(required=['LinodeID', 'ConfigID'],
