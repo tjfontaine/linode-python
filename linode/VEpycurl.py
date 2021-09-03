@@ -74,7 +74,7 @@ class VEpycurl() :
             self.pco.setopt(pycurl.COOKIEFILE, cjf.name)
             self.pco.setopt(pycurl.COOKIEJAR,  cjf.name)
         if useSOCKS :
-            # if you wish to use SOCKS, it is configured through these parms
+            # if you wish to use SOCKS, it is configured through these params
             self.pco.setopt(pycurl.PROXY,     proxy)
             self.pco.setopt(pycurl.PROXYPORT, proxyPort)
             self.pco.setopt(pycurl.PROXYTYPE, proxyType)
